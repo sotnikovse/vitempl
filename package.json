@@ -1,8 +1,7 @@
 {
-  "name": "yarn2-playground",
-  "packageManager": "yarn@3.2.3",
+  "name": "vitempl",
   "private": true,
-  "workspaces": [
-    "packages/*"
-  ]
+  "version": "0.1.0",
+  "type": "module",
+  "packageManager": "pnpm@8.9.2"
 }
