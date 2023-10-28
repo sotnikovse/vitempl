@@ -1,6 +1,5 @@
 {
-  "name": "vitempl-monorepo",
-  "private": true,
+  "name": "vitempl",
   "version": "0.0.0",
   "license": "MIT",
   "author": "Stepan Sotnikov",
@@ -24,17 +23,29 @@
     "vite"
   ],
   "packageManager": "pnpm@8.9.2",
+  "type": "module",
+  "files": [
+    "dist"
+  ],
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.mjs",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/index.mjs",
+      "require": "./dist/index.cjs"
+    }
+  },
   "scripts": {
-    "dev": "pnpm -r --parallel --filter='./packages/*' run dev",
-    "build": "pnpm -r --parallel --filter='./packages/*' run build",
-    "format": "prettier --write --cache ."
+    "dev": "unbuild --stub",
+    "build": "unbuild",
+    "prepublishOnly": "npm run build"
+  },
+  "dependencies": {
+    "@vue/compiler-sfc": "^3.3.7",
+    "vite": "^4.4.5"
   },
   "devDependencies": {
-    "@types/node": "^18.18.0",
-    "prettier": "^3.0.3",
-    "typescript": "^5.0.2",
-    "unbuild": "^2.0.0",
-    "vite": "^4.4.5",
-    "vite-plugin-inspect": "^0.7.40"
+    "rollup": "^4.1.4"
   }
 }
