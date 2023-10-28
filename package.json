@@ -1,7 +1,39 @@
 {
   "name": "vitempl",
   "private": true,
-  "version": "0.1.0",
-  "type": "module",
-  "packageManager": "pnpm@8.9.2"
+  "version": "0.0.0",
+  "license": "MIT",
+  "author": "Stepan Sotnikov",
+  "engines": {
+    "node": "^18.0.0 || >=20.0.0"
+  },
+  "homepage": "https://github.com/sotnikovse/vitempl#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/sotnikovse/vitempl.git"
+  },
+  "bugs": {
+    "url": "https://github.com/sotnikovse/vitempl/issues"
+  },
+  "keywords": [
+    "frontend",
+    "hmr",
+    "dev-server",
+    "build-tool",
+    "vite"
+  ],
+  "packageManager": "pnpm@8.9.2",
+  "scripts": {
+    "dev": "pnpm -r --parallel --filter='./packages/*' run dev",
+    "build": "pnpm -r --parallel --filter='./packages/*' run build",
+    "format": "prettier --write --cache ."
+  },
+  "devDependencies": {
+    "@types/node": "^18.18.0",
+    "prettier": "^3.0.3",
+    "typescript": "^5.0.2",
+    "unbuild": "^2.0.0",
+    "vite": "^4.4.5",
+    "vite-plugin-inspect": "^0.7.40"
+  }
 }

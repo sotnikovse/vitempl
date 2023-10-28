@@ -1,0 +1,63 @@
+{
+  "name": "vite-plugin-sfce",
+  "version": "0.0.0",
+  "license": "MIT",
+  "author": "Stepan Sotnikov",
+  "description": "Single-file custom elements with vite",
+  "engines": {
+    "node": "^18.0.0 || >=20.0.0"
+  },
+  "homepage": "https://github.com/sotnikovse/vitempl/tree/main/packages/vite-plugin-sfce#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/sotnikovse/vitempl.git",
+    "directory": "packages/vite-plugin-sfce"
+  },
+  "bugs": {
+    "url": "https://github.com/sotnikovse/vitempl/tree/main/packages/vite-plugin-sfce/issues"
+  },
+  "keywords": [
+    "frontend",
+    "hmr",
+    "dev-server",
+    "build-tool",
+    "vite",
+    "custom-elements"
+  ],
+  "packageManager": "pnpm@8.9.2",
+  "type": "module",
+  "files": [
+    "dist"
+  ],
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.mjs",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/index.mjs",
+      "require": "./dist/index.cjs"
+    }
+  },
+  "scripts": {
+    "dev": "unbuild --stub",
+    "build": "unbuild",
+    "prepublishOnly": "npm run build"
+  },
+  "dependencies": {
+    "@vue/compiler-sfc": "^3.3.7"
+  },
+  "devDependencies": {
+    "lightningcss": "^1.22.0",
+    "rollup": "^4.1.4",
+    "vite": "^4.4.5"
+  },
+  "peerDependencies": {
+    "lightningcss": "^1.22.0",
+    "vite": "^4.4.5"
+  },
+  "peerDependenciesMeta": {
+    "lightningcss": {
+      "optional": true
+    }
+  }
+}
