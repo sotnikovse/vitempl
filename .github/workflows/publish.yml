@@ -40,6 +40,8 @@ jobs:
           cache: "pnpm"
       - name: Install deps
         run: pnpm install
+      - name: Build
+        run: pnpm --filter "./packages/${{ steps.tag.outputs.pkgName }} run build"
       - name: Publish to npm
         run: pnpm publish --filter "./packages/${{ steps.tag.outputs.pkgName }}" --access public --no-git-checks
         env:
