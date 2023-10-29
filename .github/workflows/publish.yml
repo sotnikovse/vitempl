@@ -16,8 +16,7 @@ jobs:
       contents: write
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
       - name: Get pkgName for tag
         id: tag
         run: |
@@ -30,8 +29,7 @@ jobs:
             pkgName=${GITHUB_REF_NAME%@*}
           fi
           echo "pkgName=$pkgName" >> $GITHUB_OUTPUT
-      - name: Enable corepack
-        run: corepack enable
+      - run: corepack enable
       - name: Set node version to 18
         uses: actions/setup-node@v3
         with:
@@ -41,7 +39,7 @@ jobs:
       - name: Install deps
         run: pnpm install
       - name: Build
-        run: pnpm --filter "./packages/${{ steps.tag.outputs.pkgName }} run build"
+        run: pnpm --filter "./packages/${{ steps.tag.outputs.pkgName }}" run build
       - name: Publish to npm
         run: pnpm publish --filter "./packages/${{ steps.tag.outputs.pkgName }}" --access public --no-git-checks
         env:
