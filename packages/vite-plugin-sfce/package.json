@@ -1,6 +1,6 @@
 {
   "name": "vite-plugin-sfce",
-  "version": "0.0.0",
+  "version": "0.1.0",
   "license": "MIT",
   "author": "Stepan Sotnikov",
   "description": "Single-file custom elements with vite",
