@@ -38,8 +38,7 @@
   },
   "scripts": {
     "dev": "unbuild --stub",
-    "build": "unbuild",
-    "prepublishOnly": "npm run build"
+    "build": "unbuild"
   },
   "dependencies": {
     "@vue/compiler-sfc": "^3.3.7",
