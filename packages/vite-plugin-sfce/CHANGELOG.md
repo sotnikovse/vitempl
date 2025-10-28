@@ -1,3 +1,8 @@
+## [0.2.0](https://github.com/sotnikovse/vitempl/compare/vite-plugin-sfce@0.1.3...vite-plugin-sfce@0.2.0) (2025-10-28)
+### Features
+
+* pnpm -> npm, dependency upgrade ([535490c](https://github.com/sotnikovse/vitempl/commit/535490c91e12dd810df9bc444f34ffb6683edf2b))
+
 ## 0.1.3 (2023-10-29)
 
 
