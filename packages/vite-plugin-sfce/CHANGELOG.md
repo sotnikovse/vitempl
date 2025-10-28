@@ -1,3 +1,4 @@
+## <small>[0.2.1](https://github.com/sotnikovse/vitempl/compare/vite-plugin-sfce@0.2.0...vite-plugin-sfce@0.2.1) (2025-10-28)</small>
 ## [0.2.0](https://github.com/sotnikovse/vitempl/compare/vite-plugin-sfce@0.1.3...vite-plugin-sfce@0.2.0) (2025-10-28)
 ### Features
 
