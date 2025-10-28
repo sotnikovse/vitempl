@@ -1,3 +1,8 @@
+## <small>[0.2.2](https://github.com/sotnikovse/vitempl/compare/vite-plugin-sfce@0.2.1...vite-plugin-sfce@0.2.2) (2025-10-28)</small>
+### Bug Fixes
+
+* npm publish registry ([04618cc](https://github.com/sotnikovse/vitempl/commit/04618cc870c47c28739fca91143a2371205bbd52))
+
 ## [0.2.0](https://github.com/sotnikovse/vitempl/compare/vite-plugin-sfce@0.1.3...vite-plugin-sfce@0.2.0) (2025-10-28)
 
 ### Features
