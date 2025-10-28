@@ -1,5 +1,5 @@
 {
-  "name": "sfce-lightningcss",
+  "name": "sfce-playground",
   "private": true,
   "version": "0.0.0",
   "type": "module",
@@ -9,10 +9,9 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "vite-plugin-sfce": "workspace:*"
+    "vite-plugin-sfce": "*"
   },
   "devDependencies": {
-    "browserslist": "^4.22.1",
-    "lightningcss": "^1.22.0"
+    "lightningcss": "^1.30.2"
   }
 }

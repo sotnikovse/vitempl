@@ -1,32 +1,25 @@
 import { parse } from 'node:path'
 import {
   transformWithEsbuild,
+  preprocessCSS,
   Plugin,
   HtmlTagDescriptor,
   ResolvedConfig,
 } from 'vite'
+import type { SourceMap } from 'rollup'
 import * as compiler from '@vue/compiler-sfc'
 import { createRollupError } from './utils/error'
 import { kebabCase } from './utils/kebabCase'
 
-const sfceExt = '.sfce.vue'
+const defaultExt = '.sfce.vue'
 
-function createCachedImport<T>(imp: () => Promise<T>): () => T | Promise<T> {
-  let cached: T | Promise<T>
-  return () => {
-    if (!cached) {
-      cached = imp().then((module) => {
-        cached = module
-        return module
-      })
-    }
-    return cached
-  }
+type Options = {
+  extension?: string
+  templateParseOptions?: compiler.SFCParseOptions['templateParseOptions']
 }
 
-const importLightningCSS = createCachedImport(() => import('lightningcss'))
-
-export default function vitePluginSFCE(): Plugin {
+export default function vitePluginSFCE(rawOptions: Options = {}): Plugin {
+  const { templateParseOptions, extension = defaultExt } = rawOptions
   let config: ResolvedConfig
   let isBuild = false
   let sourceMap = false
@@ -42,10 +35,11 @@ export default function vitePluginSFCE(): Plugin {
     },
 
     async transform(code, id) {
-      if (id.endsWith(sfceExt)) {
+      if (id.endsWith(extension)) {
         const { descriptor, errors } = compiler.parse(code, {
           filename: id,
           sourceMap: sourceMap,
+          templateParseOptions,
         })
 
         if (errors.length) {
@@ -54,7 +48,7 @@ export default function vitePluginSFCE(): Plugin {
         }
 
         let resolvedCode: string | undefined = undefined
-        let resolvedMap: string | undefined = undefined
+        let resolvedMap: SourceMap | undefined = undefined
 
         if (descriptor.script) {
           const { code, map } = await transformWithEsbuild(
@@ -67,27 +61,22 @@ export default function vitePluginSFCE(): Plugin {
             },
           )
           resolvedCode = code
-          resolvedMap = map as any
+          resolvedMap = map
         }
 
         const templateId = `${kebabCase(
-          parse(id).base.replace(sfceExt, ''),
+          parse(id).base.replace(extension, ''),
         )}-template`
         const blocks: string[] = []
-        let stylesContent = descriptor.styles.map((style) => style.content)
+        let stylesContent: string[] = []
 
-        if (config.css?.transformer === 'lightningcss') {
-          const lightningcss = await importLightningCSS()
-
-          stylesContent = descriptor.styles.map((style) => {
-            const { code } = lightningcss.transform({
-              filename: id,
-              code: Buffer.from(style.content),
-              minify: isBuild && !!config.build.cssMinify,
-              targets: config.css?.lightningcss?.targets,
-            })
-            return code.toString()
-          })
+        for (const content of descriptor.styles) {
+          const { code } = await preprocessCSS(
+            content.content,
+            `inline&${content.lang}`,
+            config,
+          )
+          stylesContent.push(code.toString())
         }
 
         blocks.push(
@@ -141,7 +130,7 @@ export default function vitePluginSFCE(): Plugin {
       } else {
         const { chunk } = ctx
         chunk?.moduleIds?.forEach((id) => {
-          if (id.endsWith(sfceExt)) {
+          if (id.endsWith(extension)) {
             const template = templatesMap.get(id)
             if (template) {
               tags.push({

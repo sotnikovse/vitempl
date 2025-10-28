@@ -1,25 +1,25 @@
-import { release } from '@vitejs/release-scripts'
+import { readFile } from 'node:fs/promises'
 import colors from 'picocolors'
+import type { Options as ExecaOptions, ResultPromise } from 'execa'
 import { execa } from 'execa'
-import type { Options as ExecaOptions, ExecaReturnValue } from 'execa'
+import { generateChangelog, release } from '@vitejs/release-scripts'
 
-async function run(
+function run<EO extends ExecaOptions>(
   bin: string,
   args: string[],
-  opts: ExecaOptions = {},
-): Promise<ExecaReturnValue> {
-  return execa(bin, args, { stdio: 'inherit', ...opts })
+  opts?: EO,
+): ResultPromise<
+  EO & (keyof EO extends 'stdio' ? object : { stdio: 'inherit' })
+> {
+  return execa(bin, args, { stdio: 'inherit', ...opts }) as any
 }
 
 async function getLatestTag(pkgName: string): Promise<string> {
-  const tags = (await run('git', ['tag'], { stdio: 'pipe' })).stdout
-    .split(/\n/)
-    .filter(Boolean)
-  const prefix = pkgName === 'vitempl' ? 'v' : `${pkgName}@`
-  return tags
-    .filter((tag) => tag.startsWith(prefix))
-    .sort()
-    .reverse()[0]
+  const pkgJson = JSON.parse(
+    await readFile(`packages/${pkgName}/package.json`, 'utf-8'),
+  )
+  const version = pkgJson.version
+  return pkgName === 'vitempl' ? `v${version}` : `${pkgName}@${version}`
 }
 
 async function logRecentCommits(pkgName: string): Promise<void> {
@@ -58,16 +58,9 @@ release({
   logChangelog: (pkg) => logRecentCommits(pkg),
   generateChangelog: async (pkgName) => {
     console.log(colors.cyan('\nGenerating changelog...'))
-    const changelogArgs = [
-      'conventional-changelog',
-      '-p',
-      'angular',
-      '-i',
-      'CHANGELOG.md',
-      '-s',
-      '--commit-path',
-      '.',
-    ]
-    await run('npx', changelogArgs, { cwd: `packages/${pkgName}` })
+    await generateChangelog({
+      getPkgDir: () => `packages/${pkgName}`,
+      tagPrefix: pkgName === 'vitempl' ? undefined : `${pkgName}@`,
+    })
   },
 })

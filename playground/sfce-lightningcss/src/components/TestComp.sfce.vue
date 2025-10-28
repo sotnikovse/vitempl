@@ -19,7 +19,7 @@ class TestComp extends HTMLElement {
 
   connectedCallback() {
     this.shadowRoot?.querySelector('button')?.addEventListener('click', () => {
-      alert('Тестовый компонент')
+      alert('Нажата кнопка')
     })
   }
 }

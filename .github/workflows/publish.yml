@@ -4,7 +4,7 @@ on:
   push:
     tags:
       - "v*" # Push events to matching v*, i.e. v1.0, v20.15.10
-      - "vite-plugin*" # # Push events to matching vite-plugin*, i.e. vite-plugin@1.0.0
+      - "vite-plugin*" # # Push events to matching vite-plugin*, i.e. vite-plugin-sfce@1.0.0
 
 concurrency: ${{ github.workflow }}-${{ github.ref }}
 
@@ -16,7 +16,7 @@ jobs:
       contents: write
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - name: Get pkgName for tag
         id: tag
         run: |
@@ -29,24 +29,20 @@ jobs:
             pkgName=${GITHUB_REF_NAME%@*}
           fi
           echo "pkgName=$pkgName" >> $GITHUB_OUTPUT
-      - run: corepack enable
-      - name: Set node version to 18
-        uses: actions/setup-node@v3
+      - name: Setup node
+        uses: actions/setup-node@v6
         with:
-          node-version: 18
-          registry-url: https://registry.npmjs.org/
-          cache: "pnpm"
-      - name: Install deps
-        run: pnpm install
-      - name: Build
-        run: pnpm --filter "./packages/${{ steps.tag.outputs.pkgName }}" run build
-      - name: Publish to npm
-        run: pnpm publish --filter "./packages/${{ steps.tag.outputs.pkgName }}" --access public --no-git-checks
+          node-version: 22
+          cache: "npm"
+      - name: Install dependencies
+        run: npm install
+      - name: Build and Publish to npm
+        run: npm publish --workspace="./packages/${{ steps.tag.outputs.pkgName }}" --access public
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
       - name: Create Release for Tag
         id: release_tag
-        uses: yyx990803/release-tag@master
+        uses: yyx990803/release-tag@8cccf7c5aa332d71d222df46677f70f77a8d2dc0 # v1.0.0
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
