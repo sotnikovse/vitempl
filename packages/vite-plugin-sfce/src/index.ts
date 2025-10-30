@@ -6,7 +6,7 @@ import {
   HtmlTagDescriptor,
   ResolvedConfig,
 } from 'vite'
-import type { SourceMap } from 'rollup'
+import type { ModuleInfo, SourceMap } from 'rollup'
 import * as compiler from '@vue/compiler-sfc'
 import { createRollupError } from './utils/error'
 import { kebabCase } from './utils/kebabCase'
@@ -15,18 +15,52 @@ const defaultExt = '.sfce.vue'
 
 type Options = {
   extension?: string
-  templateParseOptions?: compiler.SFCParseOptions['templateParseOptions']
 }
 
 export default function vitePluginSFCE(rawOptions: Options = {}): Plugin {
-  const { templateParseOptions, extension = defaultExt } = rawOptions
+  const { extension = defaultExt } = rawOptions
   let config: ResolvedConfig
   let isBuild = false
   let sourceMap = false
   const templatesMap = new Map<string, { id: string; content: string }>()
+  const entriesModuleIdsMap = new Map<string, Set<string>>()
 
   return {
     name: 'vite-plugin-sfce',
+
+    applyToEnvironment(environment) {
+      return environment.name === 'client'
+    },
+
+    moduleParsed(info) {
+      if (info.isEntry) {
+        if (!entriesModuleIdsMap.has(info.id)) {
+          entriesModuleIdsMap.set(info.id, new Set())
+        }
+
+        const setEntryImportedIds = (
+          mod: ModuleInfo | null,
+          visited = new Set(),
+        ) => {
+          if (!mod || visited.has(mod.id)) return
+
+          visited.add(mod.id)
+
+          if (mod.id.endsWith(extension)) {
+            entriesModuleIdsMap.get(info.id)!.add(mod.id)
+          }
+
+          for (const importedId of mod.importedIds) {
+            const importedModule = this.getModuleInfo(importedId)
+            if (importedModule) {
+              setEntryImportedIds(importedModule, visited)
+            }
+          }
+        }
+
+        setEntryImportedIds(info)
+      }
+    },
 
     async configResolved(resolvedConfig) {
       config = resolvedConfig
@@ -39,7 +73,6 @@ export default function vitePluginSFCE(rawOptions: Options = {}): Plugin {
         const { descriptor, errors } = compiler.parse(code, {
           filename: id,
           sourceMap: sourceMap,
-          templateParseOptions,
         })
 
         if (errors.length) {
@@ -47,6 +80,11 @@ export default function vitePluginSFCE(rawOptions: Options = {}): Plugin {
           return null
         }
 
+        const templateId = `${kebabCase(
+          parse(id).base.replace(extension, ''),
+        )}-template`
+        const blocks: string[] = []
+        let stylesContent: string[] = []
         let resolvedCode: string | undefined = undefined
         let resolvedMap: SourceMap | undefined = undefined
 
@@ -63,12 +101,6 @@ export default function vitePluginSFCE(rawOptions: Options = {}): Plugin {
           resolvedCode = code
           resolvedMap = map
         }
-
-        const templateId = `${kebabCase(
-          parse(id).base.replace(extension, ''),
-        )}-template`
-        const blocks: string[] = []
-        let stylesContent: string[] = []
 
         for (const content of descriptor.styles) {
           const { code } = await preprocessCSS(
@@ -128,8 +160,8 @@ export default function vitePluginSFCE(rawOptions: Options = {}): Plugin {
           injectTo: 'body',
         })
       } else {
-        const { chunk } = ctx
-        chunk?.moduleIds?.forEach((id) => {
+        const moduleIds = entriesModuleIdsMap.get(ctx.filename)
+        moduleIds?.forEach((id) => {
           if (id.endsWith(extension)) {
             const template = templatesMap.get(id)
             if (template) {
