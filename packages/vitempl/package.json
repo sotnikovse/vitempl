@@ -14,10 +14,11 @@
   },
   "keywords": [
     "vite",
-    "hmr",
+    "template",
+    "engine",
+    "frontend",
     "dev-server",
-    "build-tool",
-    "frontend"
+    "build-tool"
   ],
   "type": "module",
   "engines": {
@@ -32,8 +33,9 @@
   },
   "scripts": {
     "dev": "tsdown --watch",
-    "build": "tsdown",
-    "prepublishOnly": "npm run build"
+    "build": "tsc && tsdown",
+    "prepublishOnly": "npm run build",
+    "typecheck": "tsc"
   },
   "dependencies": {
     "@vue/compiler-sfc": "^3.5.22",

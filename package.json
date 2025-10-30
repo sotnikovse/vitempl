@@ -13,11 +13,12 @@
     "url": "https://github.com/sotnikovse/vitempl/issues"
   },
   "keywords": [
+    "vite",
+    "template",
+    "engine",
     "frontend",
-    "hmr",
     "dev-server",
-    "build-tool",
-    "vite"
+    "build-tool"
   ],
   "type": "module",
   "engines": {
