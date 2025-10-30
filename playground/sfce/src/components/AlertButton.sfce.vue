@@ -1,42 +1,49 @@
 <template>
-  <h1>Тест</h1>
-  <div>
-    <button>Кнопка</button>
-  </div>
+  <button>
+    <slot></slot>
+  </button>
 </template>
 
 <script lang="ts">
-class TestComp extends HTMLElement {
+class AlertButton extends HTMLElement {
   constructor() {
     super()
 
     const shadowRoot = this.attachShadow({ mode: 'open' })
     const template = document.getElementById(
-      'test-comp-template',
+      'alert-button-template',
     ) as HTMLTemplateElement
     shadowRoot.appendChild(template.content.cloneNode(true))
   }
 
   connectedCallback() {
     this.shadowRoot?.querySelector('button')?.addEventListener('click', () => {
-      alert('Нажата кнопка')
+      alert(`Нажата кнопка "${this.textContent}"`)
     })
   }
 }
 
-export default TestComp
+export default AlertButton
 
 declare global {
   interface HTMLElementTagNameMap {
-    'test-comp': TestComp
+    'alert-button': AlertButton
   }
 }
 </script>
 
 <style>
-:host {
-  display: grid;
-  row-gap: 1rem;
+button {
+  padding: 0.5rem 0.75rem;
+  font-size: 1.125rem;
+  color: red;
+  background-color: lightgray;
   backdrop-filter: blur(8px);
+  border-radius: 0.5rem;
+  border-color: lightgray;
+}
+
+button:hover {
+  border-color: gray;
 }
 </style>

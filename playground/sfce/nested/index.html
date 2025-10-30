@@ -1,0 +1,37 @@
+<!doctype html>
+<html lang="ru">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>SFCE + Lightningcss + Vite + TS | Вложенная страница</title>
+  </head>
+  <body>
+    <header class="container">
+      <h1>Вложенная страница</h1>
+
+      <nav class="app-nav">
+        <ul>
+          <li><a href="/">Главная страница</a></li>
+          <li><a href="/nested/">Вложенная страница</a></li>
+        </ul>
+      </nav>
+    </header>
+
+    <main class="container cards-section">
+      <user-card></user-card>
+
+      <user-card>
+        <span slot="name">Иван Иванов</span>
+        <span slot="email">ivan-ivanov@mail</span>
+        <span slot="phone">+79111111111</span>
+        <div>Краткая биография</div>
+      </user-card>
+
+      <alert-button>Вложенная страница</alert-button>
+    </main>
+
+    <script type="module" src="/src/main.ts"></script>
+    <script type="module" src="/nested/nested.ts"></script>
+  </body>
+</html>

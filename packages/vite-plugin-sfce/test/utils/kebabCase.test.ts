@@ -1,7 +1,7 @@
 import { describe, expect, test } from 'vitest'
 import { kebabCase } from '../../src/utils/kebabCase'
 
-describe('kebabCase.ts', () => {
+describe('utils/kebabCase.ts', () => {
   test('should convert camelCase to kebab-case', () => {
     expect(kebabCase('camelCase')).toBe('camel-case')
   })

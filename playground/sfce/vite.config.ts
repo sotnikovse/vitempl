@@ -13,6 +13,7 @@ export default defineConfig({
     rollupOptions: {
       input: {
         main: fileURLToPath(new URL('index.html', import.meta.url)),
+        nested: fileURLToPath(new URL('nested/index.html', import.meta.url)),
       },
     },
   },
