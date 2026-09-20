@@ -1,3 +1,13 @@
+## [0.3.0](https://github.com/sotnikovse/vitempl/compare/vite-plugin-sfce%400.2.4...vite-plugin-sfce%400.3.0) (2026-09-20)
+### Features
+
+* **vite-plugin-sfce:** vite 8 ([4b8d5b4](https://github.com/sotnikovse/vitempl/commit/4b8d5b4577ec93c4bfc583897d6b26284ad027f1))
+
+### Miscellaneous Chores
+
+* deps upgrade ([0964f8f](https://github.com/sotnikovse/vitempl/commit/0964f8f0ac877ca45ad5966a3fa1302feabc48df))
+* formatting ([fa33095](https://github.com/sotnikovse/vitempl/commit/fa33095a1a718a5e18f7ca27566d0eaeab9b3b04))
+
 ## <small>[0.2.4](https://github.com/sotnikovse/vitempl/compare/vite-plugin-sfce@0.2.3...vite-plugin-sfce@0.2.4) (2025-10-30)</small>
 ### Bug Fixes
 
