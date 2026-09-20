@@ -32,19 +32,18 @@
     "dev": "npm run dev --workspace=packages --if-present",
     "build": "npm run build --workspace=packages --if-present",
     "test": "npm run test --workspace=packages --if-present",
-    "release": "tsx scripts/release.ts",
+    "release": "node scripts/release.ts",
     "format": "prettier --ignore-unknown --list-different --write ."
   },
   "devDependencies": {
-    "@types/node": "^22.18.13",
-    "@vitejs/release-scripts": "^1.6.0",
-    "execa": "^9.6.0",
+    "@types/node": "^24.13.6",
+    "@vitejs/release-scripts": "^1.10.0",
+    "execa": "^10.0.1",
     "picocolors": "^1.1.1",
-    "prettier": "^3.6.2",
-    "tsx": "^4.20.6",
-    "typescript": "^5.9.3",
-    "vite": "^7.1.12",
-    "vite-plugin-inspect": "^11.3.3",
-    "vitest": "^4.0.5"
+    "prettier": "^3.9.8",
+    "typescript": "^7.0.2",
+    "vite": "^8.3.0",
+    "vite-plugin-inspect": "^12.0.2",
+    "vitest": "^5.0.1"
   }
 }

@@ -6,7 +6,7 @@ import {
   HtmlTagDescriptor,
   ResolvedConfig,
 } from 'vite'
-import type { ModuleInfo, SourceMap } from 'rollup'
+import type { ModuleInfo, SourceMap } from 'rolldown'
 import * as compiler from '@vue/compiler-sfc'
 import { createRollupError } from './utils/error'
 import { kebabCase } from './utils/kebabCase'
