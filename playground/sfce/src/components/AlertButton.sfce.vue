@@ -7,27 +7,27 @@
 <script lang="ts">
 class AlertButton extends HTMLElement {
   constructor() {
-    super()
+    super();
 
-    const shadowRoot = this.attachShadow({ mode: 'open' })
+    const shadowRoot = this.attachShadow({ mode: "open" });
     const template = document.getElementById(
-      'alert-button-template',
-    ) as HTMLTemplateElement
-    shadowRoot.appendChild(template.content.cloneNode(true))
+      "alert-button-template",
+    ) as HTMLTemplateElement;
+    shadowRoot.appendChild(template.content.cloneNode(true));
   }
 
   connectedCallback() {
-    this.shadowRoot?.querySelector('button')?.addEventListener('click', () => {
-      alert(`Нажата кнопка "${this.textContent}"`)
-    })
+    this.shadowRoot?.querySelector("button")?.addEventListener("click", () => {
+      alert(`Нажата кнопка "${this.textContent}"`);
+    });
   }
 }
 
-export default AlertButton
+export default AlertButton;
 
 declare global {
   interface HTMLElementTagNameMap {
-    'alert-button': AlertButton
+    "alert-button": AlertButton;
   }
 }
 </script>

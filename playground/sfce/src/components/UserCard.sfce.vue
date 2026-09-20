@@ -11,21 +11,21 @@
 <script lang="ts">
 class UserCard extends HTMLElement {
   constructor() {
-    super()
+    super();
 
-    const shadowRoot = this.attachShadow({ mode: 'open' })
+    const shadowRoot = this.attachShadow({ mode: "open" });
     const template = document.getElementById(
-      'user-card-template',
-    ) as HTMLTemplateElement
-    shadowRoot.appendChild(template.content.cloneNode(true))
+      "user-card-template",
+    ) as HTMLTemplateElement;
+    shadowRoot.appendChild(template.content.cloneNode(true));
   }
 }
 
-export default UserCard
+export default UserCard;
 
 declare global {
   interface HTMLElementTagNameMap {
-    'user-card': UserCard
+    "user-card": UserCard;
   }
 }
 </script>

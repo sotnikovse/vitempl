@@ -1,3 +1,3 @@
-import AlertButton from './components/AlertButton.sfce.vue'
+import AlertButton from "./components/AlertButton.sfce.vue";
 
-customElements.define('alert-button', AlertButton)
+customElements.define("alert-button", AlertButton);

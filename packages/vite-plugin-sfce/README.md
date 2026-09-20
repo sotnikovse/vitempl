@@ -19,12 +19,12 @@ npm install -D vite-plugin-sfce
 vite.config.ts
 
 ```ts
-import { defineConfig } from 'vite'
-import vitePluginSfce from 'vite-plugin-sfce'
+import { defineConfig } from "vite";
+import vitePluginSfce from "vite-plugin-sfce";
 
 export default defineConfig({
   plugins: [vitePluginSfce()],
-})
+});
 ```
 
 components/CustomButton.sfce.vue
@@ -39,29 +39,29 @@ components/CustomButton.sfce.vue
 <script lang="ts">
 class CustomButton extends HTMLElement {
   constructor() {
-    super()
+    super();
 
-    const shadowRoot = this.attachShadow({ mode: 'open' })
+    const shadowRoot = this.attachShadow({ mode: "open" });
     const template = document.getElementById(
-      'custom-button-template',
-    ) as HTMLTemplateElement
-    shadowRoot.appendChild(template.content.cloneNode(true))
+      "custom-button-template",
+    ) as HTMLTemplateElement;
+    shadowRoot.appendChild(template.content.cloneNode(true));
   }
 
   connectedCallback() {
     this.shadowRoot
       ?.querySelector('[role="button"]')
-      ?.addEventListener('click', () => {
-        alert('Нажата кнопка')
-      })
+      ?.addEventListener("click", () => {
+        alert("Нажата кнопка");
+      });
   }
 }
 
-export default CustomButton
+export default CustomButton;
 
 declare global {
   interface HTMLElementTagNameMap {
-    'custom-button': CustomButton
+    "custom-button": CustomButton;
   }
 }
 </script>
@@ -76,8 +76,8 @@ declare global {
 main.ts
 
 ```ts
-import CustomButton from './components/CustomButton.sfce.vue'
-customElements.define('custom-button', CustomButton)
+import CustomButton from "./components/CustomButton.sfce.vue";
+customElements.define("custom-button", CustomButton);
 ```
 
 ## Конфигурация

@@ -1,21 +1,21 @@
-import { fileURLToPath } from 'node:url'
-import { defineConfig } from 'vite'
-import Inspect from 'vite-plugin-inspect'
-import vitePluginSfce from 'vite-plugin-sfce'
+import { fileURLToPath } from "node:url";
+import { defineConfig } from "vite";
+import Inspect from "vite-plugin-inspect";
+import vitePluginSfce from "vite-plugin-sfce";
 
 export default defineConfig({
-  appType: 'mpa',
+  appType: "mpa",
   css: {
-    transformer: 'lightningcss',
+    transformer: "lightningcss",
   },
   build: {
-    cssMinify: 'lightningcss',
+    cssMinify: "lightningcss",
     rollupOptions: {
       input: {
-        main: fileURLToPath(new URL('index.html', import.meta.url)),
-        nested: fileURLToPath(new URL('nested/index.html', import.meta.url)),
+        main: fileURLToPath(new URL("index.html", import.meta.url)),
+        nested: fileURLToPath(new URL("nested/index.html", import.meta.url)),
       },
     },
   },
   plugins: [Inspect(), vitePluginSfce()],
-})
+});
