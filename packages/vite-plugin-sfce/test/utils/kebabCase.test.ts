@@ -1,19 +1,21 @@
 import { describe, expect, test } from "vitest";
 import { kebabCase } from "../../src/utils/kebabCase";
 
-describe("utils/kebabCase.ts", () => {
-  test("should convert camelCase to kebab-case", () => {
+describe("kebabCase", () => {
+  test("преобразует camelCase", () => {
     expect(kebabCase("camelCase")).toBe("camel-case");
   });
 
-  test("should convert PascalCase to kebab-case", () => {
+  test("преобразует PascalCase", () => {
     expect(kebabCase("PascalCase")).toBe("pascal-case");
   });
 
-  test("should convert snake_case to kebab-case", () => {
-    const input = "snake_case";
-    const result = "snake-case";
-    expect(kebabCase(input)).toBe(result);
-    expect(kebabCase(input.toUpperCase())).toBe(result);
+  test("преобразует snake_case и верхний регистр", () => {
+    expect(kebabCase("snake_case")).toBe("snake-case");
+    expect(kebabCase("SNAKE_CASE")).toBe("snake-case");
+  });
+
+  test("преобразует пробелы", () => {
+    expect(kebabCase("custom button")).toBe("custom-button");
   });
 });

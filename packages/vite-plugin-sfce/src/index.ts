@@ -1,29 +1,70 @@
-import { parse } from "node:path";
 import {
-  transformWithEsbuild,
   preprocessCSS,
-  Plugin,
-  HtmlTagDescriptor,
-  ResolvedConfig,
+  transformWithOxc,
+  type HtmlTagDescriptor,
+  type Plugin,
+  type ResolvedConfig,
+  type Rolldown,
 } from "vite";
-import type { ModuleInfo, SourceMap } from "rolldown";
 import * as compiler from "@vue/compiler-sfc";
 import { createRollupError } from "./utils/error";
-import { kebabCase } from "./utils/kebabCase";
+import {
+  createInjectTemplateCall,
+  createTemplateContent,
+  createTemplateId,
+  injectTemplateRuntimeCode,
+} from "./utils/template";
 
-const defaultExt = ".sfce.vue";
+const defaultExtension = ".sfce.vue";
 
-type Options = {
+export type Options = {
+  /** Расширение файлов, обрабатываемых как SFC пользовательских элементов. */
   extension?: string;
 };
 
+/**
+ * Собирает id .sfce-модулей, попадающих в чанки страницы.
+ * Общие (code-split) компоненты лежат в отдельных чанках, поэтому
+ * помимо текущего чанка обходятся его статические и динамические импорты.
+ */
+function collectTemplateIds(
+  chunk: Rolldown.OutputChunk,
+  bundle: Rolldown.OutputBundle,
+  extension: string,
+): string[] {
+  const ids = new Set<string>();
+  const visited = new Set<string>();
+  const stack = [chunk];
+
+  while (stack.length > 0) {
+    const current = stack.pop()!;
+    if (visited.has(current.fileName)) continue;
+    visited.add(current.fileName);
+
+    for (const id of current.moduleIds) {
+      if (id.endsWith(extension)) ids.add(id);
+    }
+
+    for (const fileName of [...current.imports, ...current.dynamicImports]) {
+      const imported = bundle[fileName];
+      if (imported?.type === "chunk") stack.push(imported);
+    }
+  }
+
+  return [...ids];
+}
+
 export default function vitePluginSFCE(rawOptions: Options = {}): Plugin {
-  const { extension = defaultExt } = rawOptions;
+  const { extension = defaultExtension } = rawOptions;
   let config: ResolvedConfig;
   let isBuild = false;
   let sourceMap = false;
-  const templatesMap = new Map<string, { id: string; content: string }>();
-  const entriesModuleIdsMap = new Map<string, Set<string>>();
+  const templates = new Map<string, { id: string; content: string }>();
+
+  // тип map у transformWithOxc отличается от Rolldown.SourceMap из публичного API,
+  // поэтому приводим его в одном месте
+  const resolveMap = (map: unknown): Rolldown.SourceMap | { mappings: "" } =>
+    sourceMap && map ? (map as Rolldown.SourceMap) : { mappings: "" };
 
   return {
     name: "vite-plugin-sfce",
@@ -32,153 +73,126 @@ export default function vitePluginSFCE(rawOptions: Options = {}): Plugin {
       return environment.name === "client";
     },
 
-    moduleParsed(info) {
-      if (info.isEntry) {
-        if (!entriesModuleIdsMap.has(info.id)) {
-          entriesModuleIdsMap.set(info.id, new Set());
-        }
-
-        const setEntryImportedIds = (
-          mod: ModuleInfo | null,
-          visited = new Set(),
-        ) => {
-          if (!mod || visited.has(mod.id)) return;
-
-          visited.add(mod.id);
-
-          if (mod.id.endsWith(extension)) {
-            entriesModuleIdsMap.get(info.id)!.add(mod.id);
-          }
-
-          for (const importedId of mod.importedIds) {
-            const importedModule = this.getModuleInfo(importedId);
-            if (importedModule) {
-              setEntryImportedIds(importedModule, visited);
-            }
-          }
-        };
-
-        setEntryImportedIds(info);
-      }
+    // карты накапливаются между сборками в watch-режиме, поэтому сбрасываются
+    buildStart() {
+      templates.clear();
     },
 
-    async configResolved(resolvedConfig) {
+    configResolved(resolvedConfig) {
       config = resolvedConfig;
       isBuild = resolvedConfig.command === "build";
-      sourceMap = isBuild ? !!config.build.sourcemap : true;
+      sourceMap = isBuild ? !!resolvedConfig.build.sourcemap : true;
     },
 
     async transform(code, id) {
-      if (id.endsWith(extension)) {
-        const { descriptor, errors } = compiler.parse(code, {
-          filename: id,
-          sourceMap: sourceMap,
-        });
+      if (!id.endsWith(extension)) return;
 
-        if (errors.length) {
-          errors.forEach((error) => this.error(createRollupError(id, error)));
-          return null;
-        }
+      const { descriptor, errors } = compiler.parse(code, {
+        filename: id,
+        sourceMap,
+      });
 
-        const templateId = `${kebabCase(
-          parse(id).base.replace(extension, ""),
-        )}-template`;
-        const blocks: string[] = [];
-        let stylesContent: string[] = [];
-        let resolvedCode: string | undefined = undefined;
-        let resolvedMap: SourceMap | undefined = undefined;
-
-        if (descriptor.script) {
-          const { code, map } = await transformWithEsbuild(
-            descriptor.script.content,
-            id,
-            {
-              loader: "ts",
-              target: "esnext",
-              sourcemap: sourceMap,
-            },
-          );
-          resolvedCode = code;
-          resolvedMap = map;
-        }
-
-        for (const content of descriptor.styles) {
-          const { code } = await preprocessCSS(
-            content.content,
-            `inline&${content.lang}`,
-            config,
-          );
-          stylesContent.push(code.toString());
-        }
-
-        blocks.push(
-          ...stylesContent.map((content) => `\n<style>\n${content}\n</style>`),
-        );
-
-        if (descriptor.template) {
-          blocks.push(descriptor.template.content);
-        }
-
-        // при билде template сохраняется для использования в transformIndexHtml
-        // при деве в код добавляется вызов функции добавления template,
-        // которая добавлена в transformIndexHtml
-        if (blocks.length) {
-          const templateContent = blocks.join("");
-          if (isBuild) {
-            templatesMap.set(id, {
-              id: templateId,
-              content: templateContent,
-            });
-          } else {
-            resolvedCode = `_injectTemplate('${templateId}',\`${templateContent}\`)\n${resolvedCode}`;
-          }
-        }
-
-        return {
-          code: resolvedCode,
-          map: resolvedMap || {
-            mappings: "",
-          },
-        };
+      for (const error of errors) {
+        this.error(createRollupError(id, error));
       }
+
+      if (descriptor.scriptSetup) {
+        this.error({
+          id,
+          plugin: "vite-plugin-sfce",
+          message:
+            "<script setup> не поддерживается: пользовательский элемент объявляется классом в блоке <script>",
+        });
+      }
+
+      let script: string | undefined;
+      let scriptMap: unknown;
+
+      if (descriptor.script) {
+        const result = await transformWithOxc(
+          descriptor.script.content,
+          id,
+          { lang: "ts" },
+          undefined,
+          config,
+        );
+        script = result.code;
+        scriptMap = result.map;
+      }
+
+      const styles: string[] = [];
+      for (const style of descriptor.styles) {
+        const lang = style.lang ?? "css";
+        const { code } = await preprocessCSS(
+          style.content,
+          `${id}?sfce&lang.${lang}`,
+          config,
+        );
+        styles.push(code);
+      }
+
+      const templateContent = createTemplateContent({
+        styles,
+        template: descriptor.template?.content,
+      });
+
+      const map = resolveMap(scriptMap);
+
+      if (!templateContent) {
+        return script ? { code: script, map } : null;
+      }
+
+      const templateId = createTemplateId(id, extension);
+
+      if (isBuild) {
+        templates.set(id, { id: templateId, content: templateContent });
+        return { code: script ?? "", map };
+      }
+
+      // в dev шаблон приходит в рантайм, в билде — раскладывается в HTML
+      const injection = createInjectTemplateCall(templateId, templateContent);
+      return {
+        code: script ? `${script}\n${injection}` : injection,
+        map,
+      };
     },
 
     transformIndexHtml(html, ctx) {
       const tags: HtmlTagDescriptor[] = [];
-      // при деве добавляется функция добавления template
+
       if (ctx.server) {
         tags.push({
           tag: "script",
-          children: `function _injectTemplate(id, content) {
-  if (!document.getElementById(id) && content) {
-    const el = document.createElement('template')
-    el.id = id
-    el.innerHTML = content
-    document.body.appendChild(el)
-  }
-}`,
+          children: injectTemplateRuntimeCode,
           injectTo: "body",
         });
       } else {
-        const moduleIds = entriesModuleIdsMap.get(ctx.filename);
-        moduleIds?.forEach((id) => {
-          if (id.endsWith(extension)) {
-            const template = templatesMap.get(id);
-            if (template) {
-              tags.push({
-                tag: "template",
-                attrs: { id: template.id },
-                children: template.content,
-                injectTo: "body",
-              });
-            }
+        if (!ctx.chunk || !ctx.bundle) return { html, tags };
+
+        const injectedIds = new Set<string>();
+
+        for (const id of collectTemplateIds(ctx.chunk, ctx.bundle, extension)) {
+          const template = templates.get(id);
+          if (!template) continue;
+
+          if (injectedIds.has(template.id)) {
+            this.warn(
+              `Шаблон "${template.id}" уже добавлен: имена .sfce-файлов должны различаться`,
+            );
+            continue;
           }
-        });
+
+          injectedIds.add(template.id);
+          tags.push({
+            tag: "template",
+            attrs: { id: template.id },
+            children: template.content,
+            injectTo: "body",
+          });
+        }
       }
-      return {
-        html,
-        tags,
-      };
+
+      return { html, tags };
     },
   };
 }
