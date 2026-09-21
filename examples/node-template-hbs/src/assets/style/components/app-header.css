@@ -1,0 +1,20 @@
+.app-header {
+  min-height: var(--header-height);
+  display: flex;
+  align-items: center;
+  gap: 15px;
+
+  .logo a {
+    text-decoration: none;
+    color: var(--color-text-primary);
+    font-size: 20px;
+    font-weight: 600;
+  }
+
+  nav ul {
+    list-style-type: none;
+    display: inline-flex;
+    gap: 15px;
+    font-size: 16px;
+  }
+}

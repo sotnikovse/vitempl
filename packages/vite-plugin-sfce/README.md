@@ -98,6 +98,13 @@ customElements.define("custom-button", CustomButton);
 
 Расширения файлов для обработки как SFC компоненты пользовательских элементов.
 
+## Скрипты
+
+- `npm run dev` — сборка с пересборкой при изменении исходников (dev-режим)
+- `npm run build` — проверка типов и сборка в `dist/`
+- `npm run typecheck` — проверка типов
+- `npm run test` — запуск тестов
+
 ## Лицензия
 
 MIT

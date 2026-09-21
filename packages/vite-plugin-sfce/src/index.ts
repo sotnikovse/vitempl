@@ -7,13 +7,13 @@ import {
   type Rolldown,
 } from "vite";
 import * as compiler from "@vue/compiler-sfc";
-import { createRollupError } from "./utils/error";
+import { createRollupError } from "./utils/error.ts";
 import {
   createInjectTemplateCall,
   createTemplateContent,
   createTemplateId,
   injectTemplateRuntimeCode,
-} from "./utils/template";
+} from "./utils/template.ts";
 
 const defaultExtension = ".sfce.vue";
 

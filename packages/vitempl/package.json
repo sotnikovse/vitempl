@@ -3,7 +3,7 @@
   "version": "0.0.0",
   "license": "MIT",
   "author": "Stepan Sotnikov",
-  "description": "Template engine with Vite",
+  "description": "Vite-плагин: шаблоны для серверного рендеринга из Vue SFC",
   "homepage": "https://github.com/sotnikovse/vitempl#readme",
   "repository": {
     "type": "git",
@@ -14,10 +14,14 @@
   },
   "keywords": [
     "vite",
+    "vite-plugin",
+    "vue",
     "template",
     "engine",
-    "frontend",
-    "dev-server",
+    "hbs",
+    "handlebars",
+    "askama",
+    "jinja",
     "build-tool"
   ],
   "type": "module",
@@ -29,19 +33,32 @@
   ],
   "exports": {
     ".": "./dist/index.js",
-    "./package.json": "./package.json"
+    "./handlebars": "./dist/engines/handlebars.js",
+    "./askama": "./dist/engines/askama.js",
+    "./jinja": "./dist/engines/jinja.js"
   },
   "scripts": {
     "dev": "tsdown --watch",
     "build": "tsc && tsdown",
     "prepublishOnly": "npm run build",
-    "typecheck": "tsc"
+    "typecheck": "tsc",
+    "test": "vitest run"
+  },
+  "peerDependencies": {
+    "vite": "^8.0.0",
+    "vue": "^3.5.0"
   },
   "dependencies": {
-    "@vue/compiler-sfc": "^3.5.43",
-    "vite": "^8.3.0"
+    "@vue/compiler-core": "^3.5.43",
+    "@vue/shared": "^3.5.43"
   },
   "devDependencies": {
-    "tsdown": "^0.23.0"
+    "@types/node": "^24.13.6",
+    "handlebars": "^4.7.9",
+    "tsdown": "^0.23.0",
+    "typescript": "~6.0.2",
+    "vite": "^8.3.0",
+    "vitest": "^5.0.1",
+    "vue": "^3.5.43"
   }
 }

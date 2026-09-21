@@ -52,7 +52,7 @@ async function logRecentCommits(pkgName: string): Promise<void> {
 
 release({
   repo: "vitempl",
-  packages: ["vitempl", "vite-plugin-sfce"],
+  packages: ["vitempl", "vite-plugin-sfce", "@vitempl/eslint-plugin"],
   toTag: (pkg, version) =>
     pkg === "vitempl" ? `v${version}` : `${pkg}@${version}`,
   logChangelog: (pkg) => logRecentCommits(pkg),

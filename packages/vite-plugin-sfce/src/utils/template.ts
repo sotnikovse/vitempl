@@ -1,5 +1,5 @@
 import { parse } from "node:path";
-import { kebabCase } from "./kebabCase";
+import { kebabCase } from "./kebabCase.ts";
 
 /**
  * Идентификатор `<template>` в итоговом HTML.

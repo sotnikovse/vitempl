@@ -26,14 +26,20 @@
   },
   "workspaces": [
     "packages/*",
-    "playground/*"
+    "playground/*",
+    "examples/*"
   ],
   "scripts": {
-    "dev": "npm run dev --workspace=packages --if-present",
     "build": "npm run build --workspace=packages --if-present",
     "test": "npm run test --workspace=packages --if-present",
+    "typecheck": "npm run typecheck --workspaces --if-present",
     "release": "node scripts/release.ts",
-    "format": "prettier --ignore-unknown --list-different --write ."
+    "format": "prettier --ignore-unknown --list-different --write .",
+    "docs:dev": "vitepress dev docs",
+    "docs:build": "vitepress build docs",
+    "docs:preview": "vitepress preview docs",
+    "example:build": "npm run build --workspace=node-template-hbs",
+    "example:start": "npm run start --workspace=node-app"
   },
   "devDependencies": {
     "@types/node": "^24.13.6",
@@ -44,6 +50,7 @@
     "typescript": "~6.0.2",
     "vite": "^8.3.0",
     "vite-plugin-inspect": "^12.0.2",
+    "vitepress": "^2.0.0-alpha.20",
     "vitest": "^5.0.1"
   }
 }

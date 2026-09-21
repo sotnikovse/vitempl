@@ -1,0 +1,53 @@
+{
+  "name": "@vitempl/eslint-plugin",
+  "version": "0.0.0",
+  "license": "MIT",
+  "author": "Stepan Sotnikov",
+  "description": "Плагин ESLint: проверка синтаксиса шаблонов vitempl в редакторе",
+  "homepage": "https://github.com/sotnikovse/vitempl/tree/main/packages/eslint-plugin#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/sotnikovse/vitempl.git",
+    "directory": "packages/eslint-plugin"
+  },
+  "bugs": {
+    "url": "https://github.com/sotnikovse/vitempl/tree/main/packages/eslint-plugin/issues"
+  },
+  "keywords": [
+    "eslint",
+    "eslintplugin",
+    "eslint-plugin",
+    "vitempl"
+  ],
+  "type": "module",
+  "engines": {
+    "node": "^20.19.0 || >=22.12.0"
+  },
+  "files": [
+    "dist"
+  ],
+  "exports": {
+    ".": "./dist/index.js"
+  },
+  "scripts": {
+    "dev": "tsdown --watch",
+    "build": "tsc && tsdown",
+    "prepublishOnly": "npm run build",
+    "typecheck": "tsc",
+    "test": "vitest run"
+  },
+  "peerDependencies": {
+    "eslint": "^10.0.0",
+    "vitempl": "*"
+  },
+  "devDependencies": {
+    "@types/node": "^24.13.6",
+    "@typescript-eslint/parser": "^8.70.0",
+    "eslint": "^10.11.0",
+    "tsdown": "^0.23.0",
+    "typescript": "~6.0.2",
+    "vitempl": "*",
+    "vitest": "^5.0.1",
+    "vue-eslint-parser": "^10.4.1"
+  }
+}

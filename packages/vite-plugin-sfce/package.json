@@ -31,9 +31,9 @@
   },
   "scripts": {
     "dev": "tsdown --watch",
-    "build": "tsc --noEmit && tsdown",
+    "build": "tsc && tsdown",
     "prepublishOnly": "npm run build",
-    "typecheck": "tsc --noEmit",
+    "typecheck": "tsc",
     "test": "vitest run test"
   },
   "dependencies": {

@@ -13,3 +13,7 @@ dist
 .idea
 .DS_Store
 .zed
+
+# Vitepress
+**/.vitepress/dist
+**/.vitepress/cache

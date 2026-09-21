@@ -1,18 +1,23 @@
 {
-  "include": ["src"],
-  "exclude": ["**/*.test.ts"],
+  "$schema": "https://json.schemastore.org/tsconfig",
   "compilerOptions": {
-    "rootDir": "src",
-    "outDir": "dist",
     "target": "es2023",
-    "module": "preserve",
-    "moduleResolution": "bundler",
-    "strict": true,
-    "declaration": true,
-    "sourceMap": true,
-    "noImplicitOverride": true,
+    "lib": ["ES2023"],
+    "types": ["node"],
+    "skipLibCheck": true,
+
+    /* Bundler mode */
+    "module": "nodenext",
+    "allowImportingTsExtensions": true,
+    "verbatimModuleSyntax": true,
+    "moduleDetection": "force",
+    "noEmit": true,
+
+    /* Linting */
     "noUnusedLocals": true,
-    "esModuleInterop": true,
-    "resolveJsonModule": true
-  }
+    "noUnusedParameters": true,
+    "erasableSyntaxOnly": true,
+    "noFallthroughCasesInSwitch": true
+  },
+  "include": ["src/**/*.ts"]
 }

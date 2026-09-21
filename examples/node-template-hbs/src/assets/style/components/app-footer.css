@@ -1,0 +1,7 @@
+.app-footer {
+  font-size: 14px;
+  display: flex;
+  justify-content: space-between;
+  padding-block: 8px;
+  gap: 12px;
+}
