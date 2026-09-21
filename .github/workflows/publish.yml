@@ -39,7 +39,7 @@ jobs:
       - name: Install dependencies
         run: npm install
       - name: Build and Publish to npm
-        run: npm publish --workspace="./packages/${{ steps.tag.outputs.pkgName }}" --access public
+        run: npm publish --workspace=${{ steps.tag.outputs.pkgName }} --access public
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
       - name: Create Release for Tag
