@@ -1,6 +1,6 @@
 {
   "name": "@vitempl/eslint-plugin",
-  "version": "0.0.0",
+  "version": "0.1.0",
   "license": "MIT",
   "author": "Stepan Sotnikov",
   "description": "Плагин ESLint: проверка синтаксиса шаблонов vitempl в редакторе",
