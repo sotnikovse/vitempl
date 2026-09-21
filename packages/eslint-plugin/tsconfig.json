@@ -1,6 +1,9 @@
 {
   "$schema": "https://json.schemastore.org/tsconfig",
   "compilerOptions": {
+    "paths": {
+      "vitempl": ["../vitempl/src/index.ts"]
+    },
     "target": "es2023",
     "lib": ["ES2023"],
     "types": ["node"],
