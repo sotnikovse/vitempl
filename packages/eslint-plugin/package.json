@@ -21,7 +21,7 @@
   ],
   "type": "module",
   "engines": {
-    "node": "^20.19.0 || >=22.12.0"
+    "node": "^22.21.0 || ^24.11.0 || >=26.0.0"
   },
   "files": [
     "dist"
@@ -41,13 +41,13 @@
     "vitempl": "*"
   },
   "devDependencies": {
-    "@types/node": "^24.13.6",
-    "@typescript-eslint/parser": "^8.70.0",
-    "eslint": "^10.11.0",
-    "tsdown": "^0.23.0",
-    "typescript": "~6.0.2",
+    "@types/node": "^24.19.2",
+    "@typescript-eslint/parser": "^8.71.2",
+    "eslint": "^10.12.0",
+    "tsdown": "^0.23.1",
+    "typescript": "~6.0.3",
     "vitempl": "*",
-    "vitest": "^5.0.1",
+    "vitest": "^5.0.4",
     "vue-eslint-parser": "^10.4.1"
   }
 }

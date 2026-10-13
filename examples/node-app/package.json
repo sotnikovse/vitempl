@@ -9,10 +9,10 @@
     "typecheck": "tsc"
   },
   "dependencies": {
-    "handlebars": "^4.7.9"
+    "handlebars": "^4.7.10"
   },
   "devDependencies": {
-    "@types/node": "^24.13.6",
-    "typescript": "~6.0.2"
+    "@types/node": "^24.19.2",
+    "typescript": "~6.0.3"
   }
 }

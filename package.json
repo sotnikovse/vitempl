@@ -22,7 +22,7 @@
   ],
   "type": "module",
   "engines": {
-    "node": "^20.19.0 || >=22.12.0"
+    "node": "^22.21.0 || ^24.11.0 || >=26.0.0"
   },
   "workspaces": [
     "packages/*",
@@ -41,13 +41,13 @@
     "example:start": "npm run start --workspace=node-app"
   },
   "devDependencies": {
-    "@types/node": "^24.13.6",
+    "@types/node": "^24.19.2",
     "@vitejs/release-scripts": "^1.10.0",
-    "prettier": "^3.9.8",
-    "typescript": "~6.0.2",
-    "vite": "^8.3.0",
-    "vite-plugin-inspect": "^12.0.2",
+    "prettier": "^3.9.10",
+    "typescript": "~6.0.3",
+    "vite": "^8.3.4",
+    "vite-plugin-inspect": "^12.1.0",
     "vitepress": "^2.0.0-alpha.20",
-    "vitest": "^5.0.1"
+    "vitest": "^5.0.4"
   }
 }
