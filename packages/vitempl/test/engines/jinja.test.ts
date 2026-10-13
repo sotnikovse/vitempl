@@ -70,6 +70,15 @@ describe("jinja", () => {
     );
   });
 
+  test("передаёт null и undefined в props как пустое значение", () => {
+    const templates = {
+      "partials/Box": { params: ["error", "hint"], hasSlot: false },
+    };
+    expect(code('<Box :error="null" :hint="undefined" />', { templates })).toBe(
+      '{% import "partials/Box.html" as partials_box %}{{ partials_box.render(error=none, hint=none) }}',
+    );
+  });
+
   test("разрешает компоненту подключать сам себя", () => {
     expect(
       code('<Box :items="item.children" />', {

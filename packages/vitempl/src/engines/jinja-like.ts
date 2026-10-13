@@ -49,6 +49,8 @@ export interface JinjaDialect {
   some(path: string, alias: string): string;
   /** Условие «значения нет» */
   none(path: string): string;
+  /** Литерал «значения нет»: `None` в askama, `none` в Jinja */
+  nullLiteral: string;
   /** Связывает ли `some` значение с новым именем: внутри ветки путь заменяется на него */
   binds: boolean;
   /** Поддерживает ли шаблонизатор компонент, который подключает сам себя */
@@ -70,6 +72,8 @@ interface Condition {
 
 /** Директивы, которые обрабатываются на уровне элемента */
 const STRUCTURAL = new Set(["if", "else-if", "else", "for"]);
+/** Выражения «значения нет», которые Vue разбирает без ast */
+const NULLISH = new Set(["null", "undefined"]);
 /** Имя макроса, которым становится компонент */
 const MACRO = "render";
 /** Операторы сравнения: из выражения Vue — в выражение шаблонизатора */
@@ -639,6 +643,10 @@ export function generateJinjaLike(
     scope: Scope,
     loc: SourceLocation,
   ): string | undefined {
+    // простые идентификаторы и null Vue разбирает без ast
+    if (exp.ast ? isNullish(exp.ast) : NULLISH.has(exp.content.trim())) {
+      return dialect.nullLiteral;
+    }
     const literal = exp.ast ? literalOf(exp.ast) : undefined;
     return literal ?? toPath(exp, scope, loc);
   }

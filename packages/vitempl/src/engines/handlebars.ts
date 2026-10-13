@@ -483,7 +483,12 @@ function generateHandlebars(
     ) {
       return String(ast.value);
     }
-    if (ast && ast.type === "NullLiteral") {
+    // null и простые идентификаторы Vue разбирает без ast
+    if (
+      ast
+        ? ast.type === "NullLiteral"
+        : ["null", "undefined"].includes(exp.content.trim())
+    ) {
       return "null";
     }
     return toPath(exp, scope, loc);
