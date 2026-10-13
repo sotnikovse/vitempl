@@ -1,3 +1,16 @@
+## <small>[0.1.2](https://github.com/sotnikovse/vitempl/compare/%40vitempl%2Feslint-plugin%400.1.1...%40vitempl%2Feslint-plugin%400.1.2) (2026-10-13)</small>
+### Documentation
+
+* use absolute links to the docs in package READMEs ([#14](https://github.com/sotnikovse/vitempl/issues/14)) ([de3178c](https://github.com/sotnikovse/vitempl/commit/de3178c3c04c109d293f82cb97904fb9ce426719))
+
+### Miscellaneous Chores
+
+* deps upgrade ([de9c31b](https://github.com/sotnikovse/vitempl/commit/de9c31b13949a0305d8f9f316b44e1c831e76b5f))
+
+### Tests
+
+* **eslint-plugin:** cover attribute binding expressions in vitempl/syntax ([#15](https://github.com/sotnikovse/vitempl/issues/15)) ([e561b62](https://github.com/sotnikovse/vitempl/commit/e561b62135a3948fc767e1c58267cb76b7c16a54))
+
 ## <small>[0.1.1](https://github.com/sotnikovse/vitempl/compare/%40vitempl%2Feslint-plugin%400.1.0...%40vitempl%2Feslint-plugin%400.1.1) (2026-10-13)</small>
 ### Miscellaneous Chores
 
