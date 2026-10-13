@@ -1,6 +1,6 @@
 # @vitempl/eslint-plugin
 
-Плагин ESLint: показывает в редакторе ошибки синтаксиса шаблонов vitempl, те же, что и сборка. Подключение — в [документации vitempl](../vitempl/docs/eslint.md).
+Плагин ESLint: показывает в редакторе ошибки синтаксиса шаблонов vitempl, те же, что и сборка. Подключение — в [документации vitempl](https://github.com/sotnikovse/vitempl/blob/main/docs/eslint.md).
 
 ## Скрипты
 
