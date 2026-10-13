@@ -21,6 +21,7 @@ export function askama(): TemplateEngine {
     or: "||",
     some: (path, alias) => `let Some(${alias}) = ${path}`,
     none: (path) => `${path}.is_none()`,
+    nullLiteral: "None",
     binds: true,
     recursion: false,
   });

@@ -121,6 +121,12 @@ describe("handlebars", () => {
     );
   });
 
+  test("передаёт null и undefined в props как null", () => {
+    expect(code('<AppItem :error="null" :hint="undefined" />')).toBe(
+      "{{#> partials/AppItem null error=null hint=null}}{{/partials/AppItem}}",
+    );
+  });
+
   test("не передаёт компоненту данные вызывающего шаблона", () => {
     expect(
       render(

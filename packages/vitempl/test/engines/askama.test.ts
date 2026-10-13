@@ -176,6 +176,15 @@ describe("askama", () => {
     );
   });
 
+  test("передаёт null и undefined в props как пустое значение", () => {
+    const templates = {
+      "partials/Box": { params: ["error", "hint"], hasSlot: false },
+    };
+    expect(code('<Box :error="null" :hint="undefined" />', { templates })).toBe(
+      '{% import "partials/Box.html" as partials_box %}{{ partials_box::render(error=None, hint=None) }}',
+    );
+  });
+
   test("переводит объект в :class в условия", () => {
     expect(code('<i class="icon" :class="{ active: item.done }" />')).toBe(
       '<i class="icon {% if item.done %}active{% endif %}"></i>',
