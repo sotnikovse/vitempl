@@ -14,6 +14,11 @@ dist
 .DS_Store
 .zed
 
+# AI config
+.agents/*
+!.agents/skills
+.claude
+
 # Vitepress
 **/.vitepress/dist
 **/.vitepress/cache
