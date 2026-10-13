@@ -1,6 +1,6 @@
 # vitempl
 
-Vite-плагин: собирает шаблоны для серверного рендеринга (Handlebars, askama, Jinja) из компонентов Vue (SFC). Документация — в [docs](../../docs/index.md).
+Vite-плагин: собирает шаблоны для серверного рендеринга (Handlebars, askama, Jinja) из компонентов Vue (SFC). Документация — в [docs](https://github.com/sotnikovse/vitempl/blob/main/docs/index.md).
 
 ## Скрипты
 
