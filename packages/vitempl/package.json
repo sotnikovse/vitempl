@@ -1,6 +1,6 @@
 {
   "name": "vitempl",
-  "version": "0.0.0",
+  "version": "0.1.0",
   "license": "MIT",
   "author": "Stepan Sotnikov",
   "description": "Vite-плагин: шаблоны для серверного рендеринга из Vue SFC",
