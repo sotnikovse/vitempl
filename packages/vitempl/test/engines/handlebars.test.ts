@@ -89,7 +89,13 @@ describe("handlebars", () => {
 
   test("выводит булев атрибут по условию", () => {
     expect(code('<input :disabled="locked">')).toBe(
-      "<input{{#if locked}} disabled{{/if}}>",
+      "<input {{#if locked}}disabled{{/if}}>",
+    );
+  });
+
+  test("отделяет булев атрибут пробелом от предыдущего атрибута", () => {
+    expect(code('<input type="checkbox" :checked="saved">')).toBe(
+      '<input type="checkbox" {{#if saved}}checked{{/if}}>',
     );
   });
 
