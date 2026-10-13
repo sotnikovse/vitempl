@@ -1,3 +1,8 @@
+## <small>[0.1.1](https://github.com/sotnikovse/vitempl/compare/%40vitempl%2Feslint-plugin%400.1.0...%40vitempl%2Feslint-plugin%400.1.1) (2026-10-13)</small>
+### Miscellaneous Chores
+
+* init changelogs ([b5aee06](https://github.com/sotnikovse/vitempl/commit/b5aee06d15f4b5bc60c5c6867a0b864dba9b34b2))
+
 ## [0.1.0](https://github.com/sotnikovse/vitempl/compare/%40vitempl%2Feslint-plugin%400.0.0...%40vitempl%2Feslint-plugin%400.1.0) (2026-09-21)
 
 First release. ESLint plugin for [vitempl](https://github.com/sotnikovse/vitempl) templates.
