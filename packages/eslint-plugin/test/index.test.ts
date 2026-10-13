@@ -58,6 +58,26 @@ describe("syntax", () => {
     ).toEqual([]);
   });
 
+  test("сообщает о выражении в привязке атрибута, которого нет в сборке", () => {
+    expect(
+      lint(`<template>\n  <a :title="a ? 'x' : 'y'">о</a>\n</template>\n`),
+    ).toEqual([
+      {
+        line: 2,
+        column: 6,
+        message: expect.stringContaining("не поддерживается"),
+      },
+    ]);
+  });
+
+  test("не сообщает о поддерживаемых привязках атрибутов", () => {
+    expect(
+      lint(
+        `<template>\n  <input :value="user.name" :disabled="!locked" :class="{ on: active }" />\n</template>\n`,
+      ),
+    ).toEqual([]);
+  });
+
   test("требует указать шаблонизатор в настройках", () => {
     expect(() => lint("<template><p></p></template>", {})).toThrow(
       "settings.vitempl.engine",
