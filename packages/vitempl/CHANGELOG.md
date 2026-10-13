@@ -1,3 +1,9 @@
+## <small>[0.1.1](https://github.com/sotnikovse/vitempl/compare/v0.1.0...v0.1.1) (2026-10-13)</small>
+### Miscellaneous Chores
+
+* init changelogs ([b5aee06](https://github.com/sotnikovse/vitempl/commit/b5aee06d15f4b5bc60c5c6867a0b864dba9b34b2))
+* vitempl release fix ([8640fa6](https://github.com/sotnikovse/vitempl/commit/8640fa686b7daf5331374aabd9248a8081878de7))
+
 ## [0.1.0](https://github.com/sotnikovse/vitempl/compare/v0.0.0...v0.1.0) (2026-09-21)
 
 First release. A Vite plugin that builds server-side rendering templates from Vue single-file components.
