@@ -4,12 +4,14 @@ on:
   push:
     branches:
       - main
+    paths:
+      - "packages/*/package.json" # release commit always changes the package version
 
 permissions: {}
 
 jobs:
   detect-release:
-    if: github.repository == 'sotnikovse/vitempl'
+    if: github.repository == 'sotnikovse/vitempl' && startsWith(github.event.head_commit.message, 'release')
     name: Detect release commit
     runs-on: ubuntu-latest
     outputs:
