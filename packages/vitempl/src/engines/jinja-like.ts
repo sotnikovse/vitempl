@@ -400,8 +400,9 @@ export function generateJinjaLike(
       if (ast && ast.type === "BooleanLiteral") {
         return ast.value ? ` ${name}` : "";
       }
+      // пробел вне тега: иначе он склеивается с предыдущим атрибутом
       const condition = toCondition(exp, scope, directive.loc);
-      return condition ? `{% if ${condition.code} %} ${name}{% endif %}` : "";
+      return condition ? ` {% if ${condition.code} %}${name}{% endif %}` : "";
     }
     if (
       ast &&

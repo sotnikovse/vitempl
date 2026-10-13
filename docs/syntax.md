@@ -14,7 +14,7 @@
 | `v-for="(item, i) in items"`          | `{{#each items as \|item i\|}}…{{/each}}`                         |
 | `:href="item.href"`                   | `href="{{item.href}}"`                                            |
 | ``:hx-get="`/list?page=${page}`"``    | `hx-get="/list?page={{page}}"`                                    |
-| `:disabled="locked"`                  | `{{#if locked}} disabled{{/if}}`                                  |
+| `:disabled="locked"`                  | ` {{#if locked}}disabled{{/if}}`                                  |
 | `:class="{ active: isActive }"`       | `class="{{#if isActive}}active{{/if}}"`                           |
 | `<AppHeader :links="nav" />`          | `{{#> partials/AppHeader null links=nav}}{{/partials/AppHeader}}` |
 | `<slot />`                            | `{{#if @partial-block}}{{> @partial-block}}{{/if}}`               |

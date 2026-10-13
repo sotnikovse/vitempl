@@ -333,9 +333,10 @@ function generateHandlebars(
       if (ast && ast.type === "BooleanLiteral") {
         return ast.value ? ` ${name}` : "";
       }
+      // пробел вне тега: иначе он склеивается с предыдущим атрибутом
       const condition = toCondition(exp, scope, directive.loc);
       return condition
-        ? `{{#${condition.helper} ${condition.path}}} ${name}{{/${condition.helper}}}`
+        ? ` {{#${condition.helper} ${condition.path}}}${name}{{/${condition.helper}}}`
         : "";
     }
     if (

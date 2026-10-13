@@ -164,7 +164,15 @@ describe("askama", () => {
     expect(
       code('<button :formaction="item.href" :disabled="item.done">да</button>'),
     ).toBe(
-      '<button formaction="{{ item.href }}"{% if item.done %} disabled{% endif %}>да</button>',
+      '<button formaction="{{ item.href }}" {% if item.done %}disabled{% endif %}>да</button>',
+    );
+  });
+
+  test("отделяет булев атрибут пробелом от предыдущего атрибута", () => {
+    expect(
+      code('<input type="checkbox" name="remember" :checked="saved" />'),
+    ).toBe(
+      '<input type="checkbox" name="remember" {% if saved %}checked{% endif %}>',
     );
   });
 
