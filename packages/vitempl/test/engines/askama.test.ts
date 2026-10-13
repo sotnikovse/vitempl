@@ -185,6 +185,19 @@ describe("askama", () => {
     );
   });
 
+  test("выводит атрибут со значением только при условии", () => {
+    expect(
+      code(
+        `<a href="/" :aria-current="active == 'overview' ? 'page' : undefined">о</a>`,
+      ),
+    ).toBe(
+      '<a href="/" {% if active == "overview" %}aria-current="page"{% endif %}>о</a>',
+    );
+    expect(code(`<a :aria-current="active ? null : 'page'">о</a>`)).toBe(
+      '<a {% if !(active) %}aria-current="page"{% endif %}>о</a>',
+    );
+  });
+
   test("переводит объект в :class в условия", () => {
     expect(code('<i class="icon" :class="{ active: item.done }" />')).toBe(
       '<i class="icon {% if item.done %}active{% endif %}"></i>',

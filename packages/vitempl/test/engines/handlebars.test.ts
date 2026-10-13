@@ -99,6 +99,18 @@ describe("handlebars", () => {
     );
   });
 
+  test("выводит атрибут со значением только при условии", () => {
+    expect(code(`<a :aria-current="active ? 'page' : undefined">о</a>`)).toBe(
+      '<a {{#if active}}aria-current="page"{{/if}}>о</a>',
+    );
+    expect(code(`<a :aria-current="active ? null : 'page'">о</a>`)).toBe(
+      '<a {{#unless active}}aria-current="page"{{/unless}}>о</a>',
+    );
+    expect(code(`<a :aria-current="!active ? undefined : 'page'">о</a>`)).toBe(
+      '<a {{#if active}}aria-current="page"{{/if}}>о</a>',
+    );
+  });
+
   test("собирает class из статической части и объекта", () => {
     expect(
       code('<p class="a" :class="{ active: isActive, hidden: !visible }"></p>'),
