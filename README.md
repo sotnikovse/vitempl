@@ -24,6 +24,10 @@ Vite-плагин: собирает шаблоны для серверного �
 - `npm run example:build` — сборка шаблонов примера (`examples/node-template-hbs`)
 - `npm run example:start` — запуск сервера примера (`examples/node-app`)
 
+## Релизы
+
+Actions → **Prepare Release** (пакет и тип релиза) открывает PR `release: <tag>` с новой версией и CHANGELOG. После мержа (заголовок коммита сохранить `release: <tag>`) **Publish Package** публикует пакет в npm и создаёт GitHub Release с текстом из CHANGELOG. Нужны секрет `NPM_TOKEN` и разрешение «Allow GitHub Actions to create pull requests».
+
 ## Примеры
 
 Пример шаблонов и сервера к ним:

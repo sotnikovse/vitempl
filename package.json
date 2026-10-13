@@ -33,7 +33,6 @@
     "build": "npm run build --workspace=packages --if-present",
     "test": "npm run test --workspace=packages --if-present",
     "typecheck": "npm run typecheck --workspaces --if-present",
-    "release": "node scripts/release.ts",
     "format": "prettier --ignore-unknown --list-different --write .",
     "docs:dev": "vitepress dev docs",
     "docs:build": "vitepress build docs",
@@ -44,8 +43,6 @@
   "devDependencies": {
     "@types/node": "^24.13.6",
     "@vitejs/release-scripts": "^1.10.0",
-    "execa": "^10.0.1",
-    "picocolors": "^1.1.1",
     "prettier": "^3.9.8",
     "typescript": "~6.0.2",
     "vite": "^8.3.0",

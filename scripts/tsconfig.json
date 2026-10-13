@@ -5,6 +5,7 @@
     "module": "Preserve",
     "target": "ES2023",
     "moduleResolution": "bundler",
+    "allowImportingTsExtensions": true,
     "types": ["node"],
     "noEmit": true,
     "strict": true,
