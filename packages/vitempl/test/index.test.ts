@@ -135,7 +135,40 @@ describe("vitempl", () => {
     expect(await read(`public${common[0]}`)).toContain(".base-button");
   });
 
-  test("предупреждает о стилях шаблона, которого нет ни на одной странице", async () => {
+  /** Клиентские скрипты страницы и общие чанки, на которые она ссылается (modulepreload) */
+  async function scripts(page: string) {
+    const html = await read(`templates/${page}`);
+    const srcs = [
+      ...html.matchAll(/(?:src|href)="(\/assets\/[\w.-]+\.js)"/g),
+    ].map(([, src]) => src);
+    const code = await Promise.all(srcs.map((src) => read(`public${src}`)));
+    return { srcs, code: code.join("") };
+  }
+
+  test("подключает к странице скрипты компонентов, которые на ней есть", async () => {
+    const index = await scripts("pages/index.hbs");
+    const deep = await scripts("pages/nested/deep.hbs");
+
+    expect(index.code).toContain("list-item-script");
+    expect(index.code).toContain("base-button-script");
+    expect(deep.code).not.toContain("list-item-script");
+    expect(deep.code).toContain("base-button-script");
+  });
+
+  test("подключает скрипт общего компонента из одного файла", async () => {
+    const index = await scripts("pages/index.hbs");
+    const deep = await scripts("pages/nested/deep.hbs");
+
+    const common = [];
+    for (const src of index.srcs.filter((src) => deep.srcs.includes(src))) {
+      if ((await read(`public${src}`)).includes("base-button-script")) {
+        common.push(src);
+      }
+    }
+    expect(common).toHaveLength(1);
+  });
+
+  test("предупреждает о стилях и скрипте шаблона, которого нет ни на одной странице", async () => {
     const root = await mkdtemp(path.join(tmpdir(), "templates-styles-"));
     const warnings: string[] = [];
     const logger = createLogger("warn");
@@ -151,7 +184,7 @@ describe("vitempl", () => {
       );
       await writeFile(
         path.join(root, "src/partials/Only.vue"),
-        "<template><p>только во фрагменте</p></template>\n<style>.only { color: red; }</style>",
+        "<script>console.log(1)</script>\n<template><p>только во фрагменте</p></template>\n<style>.only { color: red; }</style>",
       );
       await writeFile(
         path.join(root, "src/fragments/list.vue"),
@@ -173,6 +206,9 @@ describe("vitempl", () => {
 
       expect(warnings.join("\n")).toContain(
         "src/partials/Only.vue: блок <style> не попадёт в сборку",
+      );
+      expect(warnings.join("\n")).toContain(
+        "src/partials/Only.vue: блок <script> не попадёт в сборку",
       );
     } finally {
       await rm(root, { recursive: true, force: true });

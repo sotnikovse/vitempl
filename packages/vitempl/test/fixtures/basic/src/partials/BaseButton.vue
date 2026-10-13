@@ -1,3 +1,7 @@
+<script lang="ts">
+console.log("base-button-script");
+</script>
+
 <script setup lang="ts">
 defineProps<{ label: string }>();
 </script>
