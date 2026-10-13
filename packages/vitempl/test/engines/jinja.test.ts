@@ -79,6 +79,17 @@ describe("jinja", () => {
     );
   });
 
+  test("выводит атрибут со значением только при условии", () => {
+    expect(
+      code(`<a :aria-current="active == 'overview' ? 'page' : null">о</a>`),
+    ).toBe(
+      '<a {% if active == "overview" %}aria-current="page"{% endif %}>о</a>',
+    );
+    expect(code(`<a :aria-current="active ? undefined : 'page'">о</a>`)).toBe(
+      '<a {% if not (active) %}aria-current="page"{% endif %}>о</a>',
+    );
+  });
+
   test("разрешает компоненту подключать сам себя", () => {
     expect(
       code('<Box :items="item.children" />', {

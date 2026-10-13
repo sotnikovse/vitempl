@@ -24,6 +24,8 @@ import type {
 } from "../engine.ts";
 
 type BabelNode = Exclude<SimpleExpressionNode["ast"], null | false | undefined>;
+type Conditional = Extract<BabelNode, { type: "ConditionalExpression" }>;
+type StringNode = Extract<BabelNode, { type: "StringLiteral" }>;
 
 /**
  * Чем шаблонизатор отличается от других jinja-подобных. Общая часть —
@@ -408,6 +410,12 @@ export function generateJinjaLike(
       const condition = toCondition(exp, scope, directive.loc);
       return condition ? ` {% if ${condition.code} %}${name}{% endif %}` : "";
     }
+    if (ast && ast.type === "ConditionalExpression") {
+      const conditional = conditionalAttribute(name, ast, scope);
+      if (conditional !== undefined) {
+        return conditional;
+      }
+    }
     if (
       ast &&
       (ast.type === "StringLiteral" ||
@@ -434,6 +442,34 @@ export function generateJinjaLike(
     }
     const path = toPath(exp, scope, directive.loc);
     return path ? ` ${name}="{{ ${path} }}"` : "";
+  }
+
+  /**
+   * `cond ? 'значение' : undefined` — атрибут только при условии. Пробел
+   * вне тега по той же причине, что у булева атрибута. Если форма
+   * выражения другая — undefined, и атрибут разбирается как обычный.
+   */
+  function conditionalAttribute(
+    name: string,
+    node: Conditional,
+    scope: Scope,
+  ): string | undefined {
+    const { test, consequent, alternate } = node;
+    const inverted = isNullish(consequent);
+    const literal = inverted ? alternate : consequent;
+    if (
+      literal.type !== "StringLiteral" ||
+      !isNullish(inverted ? consequent : alternate)
+    ) {
+      return;
+    }
+    const condition = toConditionNode(test, scope);
+    if (!condition || (inverted && condition.binding)) {
+      return;
+    }
+    const code = inverted ? dialect.not(`(${condition.code})`) : condition.code;
+    const value = escapeDelimiters(escapeHtml((literal as StringNode).value));
+    return ` {% if ${code} %}${name}="${value}"{% endif %}`;
   }
 
   function component(node: ElementNode, scope: Scope): string {

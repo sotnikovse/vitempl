@@ -22,6 +22,8 @@ import type {
 } from "../engine.ts";
 
 type BabelNode = Exclude<SimpleExpressionNode["ast"], null | false | undefined>;
+type Conditional = Extract<BabelNode, { type: "ConditionalExpression" }>;
+type StringNode = Extract<BabelNode, { type: "StringLiteral" }>;
 
 interface Scope {
   /** Переменные v-for, видимые в текущем месте */
@@ -339,6 +341,12 @@ function generateHandlebars(
         ? ` {{#${condition.helper} ${condition.path}}}${name}{{/${condition.helper}}}`
         : "";
     }
+    if (ast && ast.type === "ConditionalExpression") {
+      const conditional = conditionalAttribute(name, ast, scope);
+      if (conditional !== undefined) {
+        return conditional;
+      }
+    }
     if (
       ast &&
       (ast.type === "StringLiteral" ||
@@ -466,6 +474,39 @@ function generateHandlebars(
     }
     const path = pathOf(node, scope);
     return path ? { helper: "if", path } : undefined;
+  }
+
+  /**
+   * `cond ? 'значение' : undefined` — атрибут только при условии. Пробел
+   * вне тега по той же причине, что у булева атрибута. Если форма
+   * выражения другая — undefined, и атрибут разбирается как обычный.
+   */
+  function conditionalAttribute(
+    name: string,
+    node: Conditional,
+    scope: Scope,
+  ): string | undefined {
+    const { test, consequent, alternate } = node;
+    const inverted = isNullish(consequent);
+    const literal = inverted ? alternate : consequent;
+    if (
+      literal.type !== "StringLiteral" ||
+      !isNullish(inverted ? consequent : alternate)
+    ) {
+      return;
+    }
+    const condition = toConditionNode(test, scope);
+    if (!condition) {
+      return;
+    }
+    // значение в else-ветке: if меняется на unless и наоборот
+    const helper = inverted
+      ? condition.helper === "if"
+        ? "unless"
+        : "if"
+      : condition.helper;
+    const value = escapeMustache(escapeHtml((literal as StringNode).value));
+    return ` {{#${helper} ${condition.path}}}${name}="${value}"{{/${helper}}}`;
   }
 
   function toHashValue(
@@ -635,4 +676,11 @@ function escapeMustache(text: string) {
 
 function toStringLiteral(value: string) {
   return `"${value.replaceAll('"', '\\"')}"`;
+}
+
+function isNullish(node: BabelNode) {
+  return (
+    node.type === "NullLiteral" ||
+    (node.type === "Identifier" && node.name === "undefined")
+  );
 }
