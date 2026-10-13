@@ -9,8 +9,8 @@ Vite-плагин: собирает шаблоны для серверного �
 
 ## Части проекта
 
-- `packages/` — пакеты vitempl, готовятся к переносу в отдельный репозиторий: Vite-плагин [vitempl](./packages/vitempl/README.md) и плагин ESLint [@vitempl/eslint-plugin](./packages/eslint-plugin/README.md)
-- `examples/` — пример сборки шаблонов и сервера к ним, переедет вместе с vitempl: шаблоны [node-template-hbs](./examples/node-template-hbs/README.md) и сервер [node-app](./examples/node-app/README.md)
+- `packages/` — пакеты vitempl: Vite-плагин [vitempl](./packages/vitempl/README.md) и плагин ESLint [@vitempl/eslint-plugin](./packages/eslint-plugin/README.md)
+- `examples/` — пример сборки шаблонов и сервера к ним: шаблоны [node-template-hbs](./examples/node-template-hbs/README.md) и сервер [node-app](./examples/node-app/README.md)
 - `docs/` — [docs](./docs/index.md)
 
 ## Скрипты
