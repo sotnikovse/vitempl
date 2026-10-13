@@ -18,7 +18,8 @@ export interface Sfc {
 
 /**
  * Разбирает SFC и проверяет, что в нём нет ничего, что требует выполнения
- * Vue: шаблоны выполняет шаблонизатор сервера.
+ * Vue: шаблоны выполняет шаблонизатор сервера. Обычный `<script>` — не код
+ * шаблона, а клиентский модуль, его обрабатывает Vite.
  */
 export function parseSfc(source: string): Sfc {
   const { descriptor, errors } = parse(source, {
@@ -76,12 +77,6 @@ function checkBlocks(descriptor: SFCDescriptor): TemplateDiagnostic[] {
     errors.push({
       message: `<template lang="${descriptor.template.lang}"> не поддерживается`,
       loc: at(descriptor.template.loc),
-    });
-  }
-  if (descriptor.script) {
-    errors.push({
-      message: "поддерживается только <script setup>",
-      loc: at(descriptor.script.loc),
     });
   }
   for (const style of descriptor.styles) {

@@ -75,6 +75,12 @@ const STYLE_QUERY = "vitempl-style";
 const styleRequestRE = new RegExp(
   `^(.+)\\?${STYLE_QUERY}&index=(\\d+)&lang\\.`,
 );
+/**
+ * Запрос к обычному `<script>` шаблона — клиентскому модулю. Заканчивается
+ * на `lang.<язык>`, чтобы Vite обработал его как JS или TS.
+ */
+const SCRIPT_QUERY = "vitempl-script";
+const scriptRequestRE = new RegExp(`^(.+)\\?${SCRIPT_QUERY}&lang\\.`);
 /** Суффикс, по которому Vite распознаёт страницу как HTML */
 const HTML_SUFFIX = ".html";
 
@@ -155,6 +161,26 @@ export default function vitempl(options: VitemplOptions): Plugin {
     return tags;
   }
 
+  /** Ссылки на клиентские скрипты страницы и компонентов, которые она импортирует */
+  function scriptTags(page: string) {
+    const tags: HtmlTagDescriptor[] = [];
+    for (const file of reachable(page)) {
+      const script = parsed.get(file)?.descriptor.script;
+      if (script) {
+        const url = normalizePath(path.relative(config.root, file));
+        tags.push({
+          tag: "script",
+          attrs: {
+            type: "module",
+            src: `/${url}?${SCRIPT_QUERY}&lang.${script.lang ?? "js"}`,
+          },
+          injectTo: "head",
+        });
+      }
+    }
+    return tags;
+  }
+
   return {
     name: "vitempl",
     apply: "build",
@@ -212,15 +238,23 @@ export default function vitempl(options: VitemplOptions): Plugin {
       parsed = new Map(
         [...templates].map(([file, sfc]) => [normalizePath(file), sfc]),
       );
-      // стили подключаются к страницам, поэтому шаблон со стилями,
+      // стили и скрипты подключаются к страницам, поэтому шаблон с ними,
       // до которого нельзя дойти от страницы, останется без них в браузере
       const onPages = new Set(
         [...pages.values()].flatMap((page) => [...reachable(page)]),
       );
       for (const [file, sfc] of parsed) {
-        if (sfc.descriptor.styles.length > 0 && !onPages.has(file)) {
+        if (onPages.has(file)) {
+          continue;
+        }
+        if (sfc.descriptor.styles.length > 0) {
           this.warn(
             `${display(file)}: блок <style> не попадёт в сборку — шаблон не используется ни на одной странице`,
+          );
+        }
+        if (sfc.descriptor.script) {
+          this.warn(
+            `${display(file)}: блок <script> не попадёт в сборку — шаблон не используется ни на одной странице`,
           );
         }
       }
@@ -282,6 +316,10 @@ export default function vitempl(options: VitemplOptions): Plugin {
         const sfc = parsed.get(style[1]);
         return sfc?.descriptor.styles[Number(style[2])]?.content ?? null;
       }
+      const script = scriptRequestRE.exec(id);
+      if (script) {
+        return parsed.get(script[1])?.descriptor.script?.content ?? null;
+      }
       const file = pages.get(id);
       return file ? (generated.get(file) ?? null) : null;
     },
@@ -291,7 +329,10 @@ export default function vitempl(options: VitemplOptions): Plugin {
       handler(html, ctx) {
         const file = pages.get(normalizePath(ctx.filename));
         if (file) {
-          return { html: wrap(html), tags: styleTags(file) };
+          return {
+            html: wrap(html),
+            tags: [...styleTags(file), ...scriptTags(file)],
+          };
         }
       },
     },

@@ -41,14 +41,13 @@ describe("parseSfc", () => {
     ]);
   });
 
-  test("запрещает обычный <script> и допускает <style>", () => {
-    const { errors } = parseSfc(
-      "<script>export default {}</script>\n<template><p></p></template>\n<style>p {}</style>\n",
+  test("допускает обычный <script> как клиентский модуль и <style>", () => {
+    const { errors, descriptor } = parseSfc(
+      '<script lang="ts">console.log(1)</script>\n<template><p></p></template>\n<style>p {}</style>\n',
     );
 
-    expect(errors.map((error) => error.message)).toEqual([
-      "поддерживается только <script setup>",
-    ]);
+    expect(errors).toEqual([]);
+    expect(descriptor.script?.content).toContain("console.log(1)");
   });
 
   test("запрещает <style scoped> и <style module>", () => {
