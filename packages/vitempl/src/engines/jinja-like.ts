@@ -516,7 +516,8 @@ export function generateJinjaLike(
         sameNameShorthand(prop, key),
         scope,
         prop.loc,
-        templates.get(template)?.propTypes?.[key],
+        context.propTypes?.get(template),
+        key,
       );
       if (value) {
         props.set(key, value);
@@ -688,11 +689,17 @@ export function generateJinjaLike(
     exp: SimpleExpressionNode,
     scope: Scope,
     loc: SourceLocation,
-    type?: string,
+    types?: Record<string, string>,
+    key?: string,
   ): string | undefined {
     // простые идентификаторы и null Vue разбирает без ast
     if (exp.ast ? isNullish(exp.ast) : NULLISH.has(exp.content.trim())) {
-      const literal = dialect.nullLiteral(type);
+      // типов нет, если исходник компонента неизвестен (проверка одного
+      // файла): ошибку покажет сборка, где он известен
+      if (!types) {
+        return dialect.nullLiteral(undefined) ?? "null";
+      }
+      const literal = dialect.nullLiteral(key && types[key]);
       if (literal === undefined) {
         error(
           `${dialect.name} не может вывести тип «пусто» для prop: тип в TypeScript должен быть string, number или boolean (с null), иначе передайте значение из данных`,

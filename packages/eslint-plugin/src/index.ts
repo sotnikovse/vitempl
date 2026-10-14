@@ -28,6 +28,7 @@ const syntax: Rule.RuleModule = {
         for (const { message, loc } of checkSource(
           context.sourceCode.text,
           engine,
+          { file: context.physicalFilename },
         )) {
           // в ESLint столбцы считаются с нуля
           context.report({

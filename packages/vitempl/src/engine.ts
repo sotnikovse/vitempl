@@ -45,6 +45,12 @@ export interface GenerateContext {
    * и при проверке одного файла остаётся пустым.
    */
   templates: ReadonlyMap<string, TemplateInfo>;
+  /**
+   * Типы props по именам шаблонов без `null` и `undefined` (`string`,
+   * `number`, `boolean`): нужны, если «пусто» в шаблонизаторе имеет тип.
+   * Нет записи — исходник шаблона неизвестен (проверка одного файла).
+   */
+  propTypes?: ReadonlyMap<string, Record<string, string>>;
 }
 
 export interface TemplateInfo {
@@ -52,8 +58,6 @@ export interface TemplateInfo {
   params: string[];
   /** В шаблоне есть слот */
   hasSlot: boolean;
-  /** Типы props без `null` и `undefined` (`string`, `number`, `boolean`): нужны, если «пусто» в шаблонизаторе имеет тип */
-  propTypes?: Record<string, string>;
 }
 
 export interface GenerateResult {

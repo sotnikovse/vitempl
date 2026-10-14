@@ -13,6 +13,7 @@ interface Options {
   entry?: boolean;
   name?: string;
   templates?: Record<string, TemplateInfo>;
+  propTypes?: Record<string, Record<string, string>>;
 }
 
 function generate(template: string, options: Options = {}) {
@@ -24,6 +25,9 @@ function generate(template: string, options: Options = {}) {
     name: options.name ?? "pages/index",
     entry: options.entry ?? true,
     templates: new Map(Object.entries(options.templates ?? {})),
+    propTypes: options.propTypes
+      ? new Map(Object.entries(options.propTypes))
+      : undefined,
   });
 }
 
@@ -178,15 +182,15 @@ describe("askama", () => {
 
   test("передаёт null и undefined в props как None с типом prop", () => {
     const templates = {
-      "partials/Box": {
-        params: ["error", "count", "flag"],
-        hasSlot: false,
-        propTypes: { error: "string", count: "number", flag: "boolean" },
-      },
+      "partials/Box": { params: ["error", "count", "flag"], hasSlot: false },
+    };
+    const propTypes = {
+      "partials/Box": { error: "string", count: "number", flag: "boolean" },
     };
     expect(
       code('<Box :error="null" :count="undefined" :flag="null" />', {
         templates,
+        propTypes,
       }),
     ).toBe(
       '{% import "partials/Box.html" as partials_box %}{{ partials_box::render(error=None::<String>, count=None::<i64>, flag=None::<bool>) }}',
@@ -195,15 +199,21 @@ describe("askama", () => {
 
   test("сообщает, если тип prop для None неизвестен", () => {
     const templates = {
-      "partials/Box": {
-        params: ["items"],
-        hasSlot: false,
-        propTypes: {},
-      },
+      "partials/Box": { params: ["items"], hasSlot: false },
     };
-    expect(messages('<Box :items="null" />', { templates })[0]).toContain(
-      "не может вывести тип «пусто»",
-    );
+    expect(
+      messages('<Box :items="null" />', {
+        templates,
+        propTypes: { "partials/Box": {} },
+      })[0],
+    ).toContain("не может вывести тип «пусто»");
+  });
+
+  test("не сообщает об ошибке, если исходник компонента неизвестен", () => {
+    const templates = {
+      "partials/Box": { params: ["items"], hasSlot: false },
+    };
+    expect(messages('<Box :items="null" />', { templates })).toEqual([]);
   });
 
   test("выводит атрибут со значением только при условии", () => {
