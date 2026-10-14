@@ -10,7 +10,7 @@ defineProps<LoginPage>();
   <DefaultLayout :nav="nav">
     <main class="container">
       <h1>{{ title }}</h1>
-      <p v-if="error" class="error">{{ error }}</p>
+      <p v-if="error != null" class="error">{{ error }}</p>
       <form class="login-form" method="post" action="/login">
         <FormField
           label="Логин"

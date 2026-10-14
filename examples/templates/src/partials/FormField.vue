@@ -21,7 +21,7 @@ defineProps<{
       :autocomplete="autocomplete"
       required
     />
-    <small v-if="hint">{{ hint }}</small>
+    <small v-if="hint != null">{{ hint }}</small>
   </label>
 </template>
 

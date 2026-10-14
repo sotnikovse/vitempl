@@ -11,14 +11,14 @@ defineProps<IndexPage>();
   <DefaultLayout :nav="nav">
     <main class="container">
       <h1>{{ title }}</h1>
-      <div v-if="user" class="user">
+      <div v-if="user != null" class="user">
         <p>Привет, {{ user.name }}!</p>
         <ConfirmForm action="/logout" message="Выйти?">
           <button type="submit">Выйти</button>
         </ConfirmForm>
       </div>
       <p v-else>Гость, <a href="/login">войдите</a>, чтобы увидеть список.</p>
-      <ListItems v-if="list" :list="list" />
+      <ListItems v-if="list != null" :list="list" />
     </main>
   </DefaultLayout>
 </template>
