@@ -1,6 +1,10 @@
 import { hyphenate } from "@vue/shared";
 import { babelParse, parse, type SFCDescriptor } from "vue/compiler-sfc";
-import type { TemplateDiagnostic, TemplateLocation } from "./engine.ts";
+import type {
+  PropType,
+  TemplateDiagnostic,
+  TemplateLocation,
+} from "./engine.ts";
 
 export interface ComponentImport {
   /** Путь из импорта, например `../partials/AppHeader.vue` */
@@ -12,11 +16,8 @@ export interface Sfc {
   descriptor: SFCDescriptor;
   /** Импортированные компоненты: имя → импорт */
   components: Map<string, ComponentImport>;
-  /**
-   * Типы props из `defineProps<...>()` без `null` и `undefined`: имя →
-   * `string`, `number` или `boolean`. Остальные типы не перечисляются.
-   */
-  propTypes: Record<string, string>;
+  /** Типы props из `defineProps<...>()` по именам */
+  propTypes: Record<string, PropType>;
   /** Ошибки разбора, неподдерживаемые блоки и код в `<script setup>` */
   errors: TemplateDiagnostic[];
 }
@@ -111,7 +112,7 @@ function checkBlocks(descriptor: SFCDescriptor): TemplateDiagnostic[] {
 function readScript(descriptor: SFCDescriptor) {
   const components = new Map<string, ComponentImport>();
   const errors: TemplateDiagnostic[] = [];
-  let propTypes: Record<string, string> = {};
+  let propTypes: Record<string, PropType> = {};
   const script = descriptor.scriptSetup;
   if (!script) {
     return { components, propTypes, errors };
@@ -212,7 +213,7 @@ function readScript(descriptor: SFCDescriptor) {
 
 type TSNode = { type: string; [key: string]: any };
 
-const PROP_TYPES: Record<string, string> = {
+const PROP_TYPES: Record<string, PropType["type"]> = {
   TSStringKeyword: "string",
   TSNumberKeyword: "number",
   TSBooleanKeyword: "boolean",
@@ -220,7 +221,7 @@ const PROP_TYPES: Record<string, string> = {
 
 /** Типы props из аргумента типа `defineProps<...>()`: литерал или объявление в файле */
 function readPropTypes(call: any, declarations: Map<string, TSNode>) {
-  const types: Record<string, string> = {};
+  const types: Record<string, PropType> = {};
   let node: TSNode | undefined = (call.typeParameters ?? call.typeArguments)
     ?.params?.[0];
   if (node?.type === "TSTypeReference" && node.typeName.type === "Identifier") {
@@ -242,15 +243,16 @@ function readPropTypes(call: any, declarations: Map<string, TSNode>) {
     if (member.type !== "TSPropertySignature" || !name || !type) {
       continue;
     }
-    // `string | null` — тип без пустых значений
-    const rest = (type.type === "TSUnionType" ? type.types : [type]).filter(
-      (item: TSNode) =>
+    // `string | null` — тип без пустых значений и признак, что они допустимы
+    const items: TSNode[] = type.type === "TSUnionType" ? type.types : [type];
+    const rest = items.filter(
+      (item) =>
         item.type !== "TSNullKeyword" && item.type !== "TSUndefinedKeyword",
     );
-    const known = rest.length === 1 ? PROP_TYPES[rest[0].type] : undefined;
-    if (known) {
-      types[name] = known;
-    }
+    types[name] = {
+      type: rest.length === 1 ? PROP_TYPES[rest[0].type] : undefined,
+      nullable: Boolean(member.optional) || rest.length < items.length,
+    };
   }
   return types;
 }

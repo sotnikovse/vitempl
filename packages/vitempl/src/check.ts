@@ -1,6 +1,6 @@
 import { readFileSync } from "node:fs";
 import path from "node:path";
-import type { TemplateDiagnostic, TemplateEngine } from "./engine.ts";
+import type { PropType, TemplateDiagnostic, TemplateEngine } from "./engine.ts";
 import { componentTags, parseSfc } from "./sfc.ts";
 
 export interface CheckOptions {
@@ -25,7 +25,7 @@ export function checkSource(
   const sfc = parseSfc(source);
   const { file } = options;
   // типы props импортированных компонентов по их путям из импорта
-  const propTypes = new Map<string, Record<string, string>>();
+  const propTypes = new Map<string, Record<string, PropType>>();
   if (file) {
     for (const { source: specifier } of sfc.components.values()) {
       try {

@@ -4,25 +4,26 @@
 
 - `templates/` — шаблоны на Vue SFC и клиентская статика. Исходники не зависят от шаблонизатора: под какой собирать, задаёт переменная `ENGINE` (`handlebars`, `askama`, `jinja`), результат попадает в `dist/<ENGINE>/`;
 - `data/` — общие JSON-данные страниц, из которых сервер собирает данные для шаблонов;
-- `node-app/` — сервер на Node.js (Handlebars), который рендерит собранные шаблоны и раздаёт статику; что он умеет и как устроен — в его README.
+- `node-app/` — сервер на Node.js (Handlebars), который рендерит собранные шаблоны и раздаёт статику; что он умеет и как устроен — в его README;
+- `axum-app/` — сервер на Rust (axum + askama) с теми же маршрутами: askama компилирует собранные шаблоны в бинарник.
 
-Собрать шаблоны для Handlebars и запустить сервер примера можно из корня репозитория: `npm run example:build`, затем `npm run example:start`. Для другого шаблонизатора: `ENGINE=askama npm run build --workspace=example-templates`.
+Собрать шаблоны для Handlebars и запустить сервер примера можно из корня репозитория: `npm run example:build`, затем `npm run example:start`. Для askama: `ENGINE=askama npm run build --workspace=example-templates`, затем `cargo run --manifest-path examples/axum-app/Cargo.toml`.
 
 ## Что где показано
 
-| Возможность                                                              | Где смотреть                                                                       |
-| ------------------------------------------------------------------------ | ---------------------------------------------------------------------------------- |
-| Условия `v-if` / `v-else`                                                | `pages/index.vue`: пользователь или гость                                          |
-| Цикл `v-for`                                                             | `partials/AppHeader.vue`, `partials/ListItems.vue`                                 |
-| Layout и слот, вложенные компоненты                                      | `layouts/DefaultLayout.vue` (слот для страницы), страницы передают в него `<main>` |
-| Фрагмент для htmx: список подменяется без перезагрузки                   | `fragments/items-list.vue`, ссылки пагинации в `partials/ListItems.vue`            |
-| Атрибут только при условии (`cond ? 'page' : undefined`)                 | `partials/AppHeader.vue`: `aria-current` у текущего пункта меню                    |
-| Булев атрибут по данным (`:checked`)                                     | `pages/login.vue`: галочка «Запомнить меня» после ошибки входа                     |
-| `null` в props (`string \| null`), типизированный `None` в askama        | `pages/login.vue` и `partials/FormField.vue`: поле без подсказки и без значения    |
-| Клиентский скрипт компонента (`<script>`), подключается только где нужен | `partials/ConfirmForm.vue`: подтверждение выхода на главной                        |
-| Стили страницы и компонента (`<style>`)                                  | `pages/login.vue`, `partials/FormField.vue`                                        |
-| Общие стили и статика                                                    | `src/assets/style`, `public/`                                                      |
-| Контракт данных с сервером                                               | `src/types.ts`                                                                     |
+| Возможность                                                              | Где смотреть                                                                                                  |
+| ------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------- |
+| Условия `v-if` / `v-else`                                                | `pages/index.vue`: пользователь или гость                                                                     |
+| Цикл `v-for`                                                             | `partials/AppHeader.vue`, `partials/ListItems.vue`                                                            |
+| Layout и слот, вложенные компоненты                                      | `layouts/DefaultLayout.vue` (слот для страницы), страницы передают в него `<main>`                            |
+| Фрагмент для htmx: список подменяется без перезагрузки                   | `fragments/items-list.vue`, ссылки пагинации в `partials/ListItems.vue`                                       |
+| Атрибут только при условии (`cond ? 'page' : undefined`)                 | `partials/AppHeader.vue`: `aria-current` у текущего пункта меню                                               |
+| Булев атрибут по данным (`:checked`)                                     | `pages/login.vue`: галочка «Запомнить меня» после ошибки входа                                                |
+| `null` в props (`string \| null`), типизированный `None` в askama        | `pages/login.vue` и `partials/FormField.vue`: поле без подсказки (`:hint="null"`) и с подсказкой (`hint="…"`) |
+| Клиентский скрипт компонента (`<script>`), подключается только где нужен | `partials/ConfirmForm.vue`: подтверждение выхода на главной                                                   |
+| Стили страницы и компонента (`<style>`)                                  | `pages/login.vue`, `partials/FormField.vue`                                                                   |
+| Общие стили и статика                                                    | `src/assets/style`, `public/`                                                                                 |
+| Контракт данных с сервером                                               | `src/types.ts`                                                                                                |
 
 ## Структура проекта шаблонов
 
@@ -45,7 +46,7 @@ dist/<ENGINE>/  результат сборки: templates/ и public/
 
 ## Данные и типы
 
-Данные шаблона — props компонента. Типы страниц и фрагментов лежат рядом с шаблонами, в `src/types.ts`, и служат контрактом: сервер на любом языке отдаёт данные такой формы (в `node-app` она проверяется типами `data.ts`, для других серверов повторяется вручную):
+Данные шаблона — props компонента. Типы страниц и фрагментов лежат рядом с шаблонами, в `src/types.ts`, и служат контрактом: сервер на любом языке отдаёт данные такой формы (в `node-app` она проверяется типами `data.ts`, в `axum-app` повторена структурами Rust вручную, а askama при компиляции проверяет, что шаблон обращается только к существующим полям):
 
 <<< ../examples/templates/src/pages/about.vue
 

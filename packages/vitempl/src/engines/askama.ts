@@ -33,6 +33,8 @@ export function askama(): TemplateEngine {
       const rust = type && RUST_TYPES[type];
       return rust ? `None::<${rust}>` : undefined;
     },
+    // параметр с «пусто» в askama — Option, поэтому значение оборачивается
+    nullable: (literal) => `Some(${literal})`,
     binds: true,
     recursion: false,
   });

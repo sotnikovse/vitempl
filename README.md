@@ -10,7 +10,7 @@ Vite-плагин: собирает шаблоны для серверного �
 ## Части проекта
 
 - `packages/` — пакеты vitempl: Vite-плагин [vitempl](./packages/vitempl/README.md) и плагин ESLint [@vitempl/eslint-plugin](./packages/eslint-plugin/README.md)
-- `examples/` — пример сборки шаблонов и сервера к ним: общие шаблоны [templates](./examples/templates/README.md) и сервер [node-app](./examples/node-app/README.md)
+- `examples/` — пример сборки шаблонов и сервера к ним: общие шаблоны [templates](./examples/templates/README.md) и серверы к ним: [node-app](./examples/node-app/README.md) (Handlebars), [axum-app](./examples/axum-app/README.md) (askama)
 - `docs/` — [docs](./docs/index.md)
 
 ## Скрипты

@@ -4,8 +4,8 @@ defineProps<{
   name: string;
   type: string;
   autocomplete: string;
-  /** Значение поля; `null` — поле пустое */
-  value: string | null;
+  /** Значение поля; пустая строка — поле пустое */
+  value: string;
   /** Подсказка под полем; `null` — подсказки нет */
   hint: string | null;
 }>();

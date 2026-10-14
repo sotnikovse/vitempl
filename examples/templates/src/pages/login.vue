@@ -25,7 +25,7 @@ defineProps<LoginPage>();
           name="password"
           type="password"
           autocomplete="current-password"
-          :value="null"
+          value=""
           hint="Для примера подходит admin / admin"
         />
         <label class="remember">

@@ -19,6 +19,7 @@ import {
 import type {
   GenerateContext,
   GenerateResult,
+  PropType,
   TemplateEngine,
   TemplateInfo,
 } from "../engine.ts";
@@ -57,6 +58,11 @@ export interface JinjaDialect {
    * `boolean`); undefined — тип неизвестен, и значение передать нельзя.
    */
   nullLiteral(type?: string): string | undefined;
+  /**
+   * Литерал для prop, допускающего «пусто»: в askama это `Some(...)`, так
+   * как параметр — `Option`. Если не задан, значение передаётся как есть.
+   */
+  nullable?(literal: string): string;
   /** Связывает ли `some` значение с новым именем: внутри ветки путь заменяется на него */
   binds: boolean;
   /** Поддерживает ли шаблонизатор компонент, который подключает сам себя */
@@ -498,9 +504,14 @@ export function generateJinjaLike(
     const props = new Map<string, string>();
     for (const prop of node.props) {
       if (prop.type === NodeTypes.ATTRIBUTE) {
+        const key = camelize(prop.name);
         props.set(
-          camelize(prop.name),
-          prop.value ? toStringLiteral(prop.value.content) : "true",
+          key,
+          someIfNullable(
+            prop.value ? toStringLiteral(prop.value.content) : "true",
+            context.propTypes?.get(template),
+            key,
+          ),
         );
         continue;
       }
@@ -689,7 +700,7 @@ export function generateJinjaLike(
     exp: SimpleExpressionNode,
     scope: Scope,
     loc: SourceLocation,
-    types?: Record<string, string>,
+    types?: Record<string, PropType>,
     key?: string,
   ): string | undefined {
     // простые идентификаторы и null Vue разбирает без ast
@@ -699,7 +710,7 @@ export function generateJinjaLike(
       if (!types) {
         return dialect.nullLiteral(undefined) ?? "null";
       }
-      const literal = dialect.nullLiteral(key && types[key]);
+      const literal = dialect.nullLiteral(key && types[key]?.type);
       if (literal === undefined) {
         error(
           `${dialect.name} не может вывести тип «пусто» для prop: тип в TypeScript должен быть string, number или boolean (с null), иначе передайте значение из данных`,
@@ -709,7 +720,20 @@ export function generateJinjaLike(
       return literal;
     }
     const literal = exp.ast ? literalOf(exp.ast) : undefined;
-    return literal ?? toPath(exp, scope, loc);
+    return literal === undefined
+      ? toPath(exp, scope, loc)
+      : someIfNullable(literal, types, key);
+  }
+
+  /** Литерал для prop, допускающего «пусто», оборачивается, если шаблонизатор это требует */
+  function someIfNullable(
+    literal: string,
+    types?: Record<string, PropType>,
+    key?: string,
+  ) {
+    return key && types?.[key]?.nullable && dialect.nullable
+      ? dialect.nullable(literal)
+      : literal;
   }
 
   function toPath(

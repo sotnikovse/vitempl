@@ -1,0 +1,3 @@
+# Шаблоны собирает vitempl: `ENGINE=askama npm run build -w example-templates`
+[general]
+dirs = ["../templates/dist/askama/templates"]
