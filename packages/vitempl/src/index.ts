@@ -81,6 +81,12 @@ const styleRequestRE = new RegExp(
  */
 const SCRIPT_QUERY = "vitempl-script";
 const scriptRequestRE = new RegExp(`^(.+)\\?${SCRIPT_QUERY}&lang\\.`);
+/** Заглушка вместо тега шаблонизатора на время разбора страницы в Vite */
+const PLACEHOLDER = "__vitempl_";
+const placeholderRE = new RegExp(
+  ` ${PLACEHOLDER}(\\d+)s__|${PLACEHOLDER}(\\d+)__`,
+  "g",
+);
 /** Суффикс, по которому Vite распознаёт страницу как HTML */
 const HTML_SUFFIX = ".html";
 
@@ -116,6 +122,26 @@ export default function vitempl(options: VitemplOptions): Plugin {
   /** Страницы после обработки Vite: файл исходника → HTML */
   const output = new Map<string, string>();
 
+  /** Теги шаблонизатора, скрытые от Vite: номер в заглушке — индекс */
+  const hidden: string[] = [];
+  /** Vite разбирает страницу как HTML, поэтому вместо тегов шаблонизатора он видит заглушки */
+  const hideTags = (html: string) =>
+    engine.tags
+      ? html.replace(engine.tags, (tag, offset: number, source: string) => {
+          const index = hidden.push(tag) - 1;
+          // тег сразу после кавычки (`class="a"{% if %}`) для parse5 невалиден:
+          // заглушка отделяется пробелом, который при возврате убирается
+          return /["']/.test(source[offset - 1] ?? "")
+            ? ` ${PLACEHOLDER}${index}s__`
+            : `${PLACEHOLDER}${index}__`;
+        })
+      : html;
+  const showTags = (html: string) =>
+    html.replace(
+      placeholderRE,
+      (match, spaced?: string, plain?: string) =>
+        hidden[Number(spaced ?? plain)] ?? match,
+    );
   const wrap = (html: string) => shellSource.replace(placeholder, () => html);
   const display = (file: string) =>
     normalizePath(path.relative(config.root, file));
@@ -261,6 +287,7 @@ export default function vitempl(options: VitemplOptions): Plugin {
 
       generated.clear();
       output.clear();
+      hidden.length = 0;
       const entries = new Set(
         [...pages.values(), ...fragments].map((file) => normalizePath(file)),
       );
@@ -336,7 +363,7 @@ export default function vitempl(options: VitemplOptions): Plugin {
         const file = pages.get(normalizePath(ctx.filename));
         if (file) {
           return {
-            html: wrap(html),
+            html: hideTags(wrap(html)),
             tags: [...styleTags(file), ...scriptTags(file)],
           };
         }
@@ -354,9 +381,11 @@ export default function vitempl(options: VitemplOptions): Plugin {
           }
           output.set(
             file,
-            typeof asset.source === "string"
-              ? asset.source
-              : new TextDecoder().decode(asset.source),
+            showTags(
+              typeof asset.source === "string"
+                ? asset.source
+                : new TextDecoder().decode(asset.source),
+            ),
           );
           delete bundle[fileName];
         }

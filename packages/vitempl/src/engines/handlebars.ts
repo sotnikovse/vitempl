@@ -48,6 +48,7 @@ export function handlebars(): TemplateEngine {
   return {
     name: "handlebars",
     extension: ".hbs",
+    tags: /\{\{!--[\s\S]*?--\}\}|\{\{[\s\S]*?\}\}\}?/g,
     generate: generateHandlebars,
   };
 }
