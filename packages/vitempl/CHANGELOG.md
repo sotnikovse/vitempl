@@ -1,3 +1,8 @@
+## <small>[0.1.4](https://github.com/sotnikovse/vitempl/compare/v0.1.3...v0.1.4) (2026-10-14)</small>
+### Bug Fixes
+
+* **eslint-plugin:** infer null prop types from imported component files ([#24](https://github.com/sotnikovse/vitempl/issues/24)) ([e1a403d](https://github.com/sotnikovse/vitempl/commit/e1a403d614da20d85cdfc3d4c1191abff49cda49))
+
 ## <small>[0.1.3](https://github.com/sotnikovse/vitempl/compare/v0.1.2...v0.1.3) (2026-10-14)</small>
 ### Bug Fixes
 
