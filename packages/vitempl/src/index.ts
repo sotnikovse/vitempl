@@ -293,6 +293,12 @@ export default function vitempl(options: VitemplOptions): Plugin {
       );
       /** Разбор шаблонов: вызов компонента может зависеть от самого компонента */
       const infos = new Map<string, TemplateInfo>();
+      const propTypes = new Map(
+        [...templates].map(([file, sfc]) => [
+          templateName(file),
+          sfc.propTypes,
+        ]),
+      );
       const contexts = new Map<string, GenerateContext>();
       for (const [file, sfc] of templates) {
         contexts.set(file, {
@@ -302,6 +308,7 @@ export default function vitempl(options: VitemplOptions): Plugin {
           name: templateName(file),
           entry: entries.has(normalizePath(file)),
           templates: infos,
+          propTypes,
         });
       }
       if (engine.analyze) {
@@ -313,12 +320,6 @@ export default function vitempl(options: VitemplOptions): Plugin {
               contexts.get(file)!,
             ),
           );
-        }
-        // типы props известны из исходника, а не из шаблона: вызывающий
-        // использует их, когда передаёт «пусто» в типизированный шаблонизатор
-        for (const [file, sfc] of templates) {
-          const name = templateName(file);
-          infos.set(name, { ...infos.get(name)!, propTypes: sfc.propTypes });
         }
       }
 

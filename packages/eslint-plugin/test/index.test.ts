@@ -1,15 +1,20 @@
+import { mkdtempSync, rmSync, writeFileSync } from "node:fs";
+import { tmpdir } from "node:os";
+import path from "node:path";
 import tsParser from "@typescript-eslint/parser";
 import { Linter } from "eslint";
+import { askama } from "vitempl/askama";
 import { handlebars } from "vitempl/handlebars";
 import vueParser from "vue-eslint-parser";
-import { describe, expect, test } from "vitest";
+import { afterAll, beforeAll, describe, expect, test } from "vitest";
 import plugin from "../src/index.ts";
 
 function lint(
   source: string,
   settings: Record<string, unknown> = { vitempl: { engine: handlebars() } },
+  filename = "Component.vue",
 ) {
-  return new Linter()
+  return new Linter({ cwd: path.dirname(path.resolve(filename)) })
     .verify(
       source,
       [
@@ -24,7 +29,7 @@ function lint(
           rules: { "vitempl/syntax": "error" },
         },
       ],
-      { filename: "Component.vue" },
+      { filename },
     )
     .map(({ line, column, message }) => ({ line, column, message }));
 }
@@ -76,6 +81,48 @@ describe("syntax", () => {
         `<template>\n  <input :value="user.name" :disabled="!locked" :class="{ on: active }" />\n</template>\n`,
       ),
     ).toEqual([]);
+  });
+
+  describe("тип «пусто» в askama", () => {
+    const settings = { vitempl: { engine: askama() } };
+    const page = (prop: string) =>
+      `<script setup lang="ts">\nimport Field from "./Field.vue";\n</script>\n\n<template>\n  <Field :${prop}="null" />\n</template>\n`;
+    const field = (type: string) =>
+      `<script setup lang="ts">\ndefineProps<{ hint: ${type} }>();\n</script>\n<template><p>{{ hint }}</p></template>\n`;
+    let dir: string;
+    const lintPage = (type: string) => {
+      writeFileSync(path.join(dir, "Field.vue"), field(type));
+      return lint(page("hint"), settings, path.join(dir, "Page.vue"));
+    };
+
+    beforeAll(() => {
+      dir = mkdtempSync(path.join(tmpdir(), "vitempl-lint-"));
+    });
+    afterAll(() => rmSync(dir, { recursive: true, force: true }));
+
+    test("берёт тип prop из файла компонента", () => {
+      expect(lintPage("string | null")).toEqual([]);
+    });
+
+    test("сообщает, если тип prop вывести нельзя", () => {
+      expect(lintPage("{ a: string } | null")).toEqual([
+        {
+          line: 6,
+          column: 10,
+          message: expect.stringContaining("не может вывести тип «пусто»"),
+        },
+      ]);
+    });
+
+    test("не сообщает об ошибке, если файл компонента не прочитать", () => {
+      expect(
+        lint(
+          page("hint").replace("./Field.vue", "./Missing.vue"),
+          settings,
+          path.join(dir, "Page.vue"),
+        ),
+      ).toEqual([]);
+    });
   });
 
   test("требует указать шаблонизатор в настройках", () => {
