@@ -1,6 +1,13 @@
 import type { TemplateEngine } from "../engine.ts";
 import { jinjaEngine } from "./jinja-like.ts";
 
+/** Тип Rust для типа prop в TypeScript (`number` — целое, как принято в адаптере) */
+const RUST_TYPES: Record<string, string> = {
+  string: "String",
+  number: "i64",
+  boolean: "bool",
+};
+
 /**
  * askama: компилируемые в Rust шаблоны на основе Jinja.
  *
@@ -21,7 +28,11 @@ export function askama(): TemplateEngine {
     or: "||",
     some: (path, alias) => `let Some(${alias}) = ${path}`,
     none: (path) => `${path}.is_none()`,
-    nullLiteral: "None",
+    // Rust не выводит тип голого `None`, поэтому он берётся из типа prop
+    nullLiteral: (type) => {
+      const rust = type && RUST_TYPES[type];
+      return rust ? `None::<${rust}>` : undefined;
+    },
     binds: true,
     recursion: false,
   });

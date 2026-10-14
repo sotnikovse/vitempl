@@ -20,7 +20,7 @@ export function jinja(): TemplateEngine {
     or: "or",
     some: (path) => `${path} is not none`,
     none: (path) => `${path} is none`,
-    nullLiteral: "none",
+    nullLiteral: () => "none",
     binds: false,
     recursion: true,
   });

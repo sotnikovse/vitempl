@@ -50,6 +50,23 @@ describe("parseSfc", () => {
     expect(descriptor.script?.content).toContain("console.log(1)");
   });
 
+  test("читает типы props без null и undefined", () => {
+    const literal = parseSfc(
+      '<script setup lang="ts">\ndefineProps<{ a: string | null; b?: number; c: boolean | undefined; d: string[] | null; e: string | number }>();\n</script>\n<template><p></p></template>\n',
+    );
+    const named = parseSfc(
+      '<script setup lang="ts">\ninterface Props { a: string | null }\ntype Other = { b: number }\nconst props = defineProps<Props>();\n</script>\n<template><p></p></template>\n',
+    );
+
+    expect(literal.errors).toEqual([]);
+    expect(literal.propTypes).toEqual({
+      a: "string",
+      b: "number",
+      c: "boolean",
+    });
+    expect(named.propTypes).toEqual({ a: "string" });
+  });
+
   test("запрещает <style scoped> и <style module>", () => {
     const { errors } = parseSfc(
       "<template><p></p></template>\n<style scoped>p {}</style>\n",

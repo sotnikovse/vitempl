@@ -176,12 +176,33 @@ describe("askama", () => {
     );
   });
 
-  test("передаёт null и undefined в props как пустое значение", () => {
+  test("передаёт null и undefined в props как None с типом prop", () => {
     const templates = {
-      "partials/Box": { params: ["error", "hint"], hasSlot: false },
+      "partials/Box": {
+        params: ["error", "count", "flag"],
+        hasSlot: false,
+        propTypes: { error: "string", count: "number", flag: "boolean" },
+      },
     };
-    expect(code('<Box :error="null" :hint="undefined" />', { templates })).toBe(
-      '{% import "partials/Box.html" as partials_box %}{{ partials_box::render(error=None, hint=None) }}',
+    expect(
+      code('<Box :error="null" :count="undefined" :flag="null" />', {
+        templates,
+      }),
+    ).toBe(
+      '{% import "partials/Box.html" as partials_box %}{{ partials_box::render(error=None::<String>, count=None::<i64>, flag=None::<bool>) }}',
+    );
+  });
+
+  test("сообщает, если тип prop для None неизвестен", () => {
+    const templates = {
+      "partials/Box": {
+        params: ["items"],
+        hasSlot: false,
+        propTypes: {},
+      },
+    };
+    expect(messages('<Box :items="null" />', { templates })[0]).toContain(
+      "не может вывести тип «пусто»",
     );
   });
 
