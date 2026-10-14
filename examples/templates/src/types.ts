@@ -9,6 +9,8 @@
 export interface NavItem {
   title: string;
   href: string;
+  /** Пункт текущей страницы */
+  active: boolean;
 }
 
 export type Nav = NavItem[];
@@ -47,6 +49,10 @@ export interface LoginPage {
   nav: Nav;
   /** Сообщение об ошибке входа */
   error?: string;
+  /** Введённый логин: после ошибки форма заполняется заново */
+  login: string;
+  /** Отмечена ли галочка «Запомнить меня» */
+  remember: boolean;
 }
 
 export interface ErrorPage {

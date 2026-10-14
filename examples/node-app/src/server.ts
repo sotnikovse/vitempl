@@ -19,6 +19,8 @@ import {
 
 /** Кука сессии. Для примера она без подписи и проверок, только признак входа */
 const SESSION_COOKIE = "session";
+/** Срок жизни куки с галочкой «Запомнить меня», секунды */
+const REMEMBER_MAX_AGE = 60 * 60 * 24 * 30;
 /** Ограничение на размер формы */
 const MAX_BODY_SIZE = 4096;
 
@@ -148,21 +150,23 @@ const server = createServer(async (req, res) => {
         return;
       case "POST /login": {
         const form = await readForm(req);
-        if (
-          !authenticate(form.get("login") ?? "", form.get("password") ?? "")
-        ) {
+        const login = form.get("login") ?? "";
+        const remember = form.has("remember");
+        if (!authenticate(login, form.get("password") ?? "")) {
           render(
             res,
             401,
             "pages/login",
-            loginPage("Неверный логин или пароль"),
+            loginPage({ login, remember }, "Неверный логин или пароль"),
           );
           return;
         }
+        // «Запомнить меня» — кука живёт месяц, иначе до закрытия браузера
+        const maxAge = remember ? `; Max-Age=${REMEMBER_MAX_AGE}` : "";
         redirect(
           res,
           "/",
-          `${SESSION_COOKIE}=admin; Path=/; HttpOnly; SameSite=Lax`,
+          `${SESSION_COOKIE}=admin; Path=/; HttpOnly; SameSite=Lax${maxAge}`,
         );
         return;
       }

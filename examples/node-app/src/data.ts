@@ -21,8 +21,10 @@ import navJson from "../../data/nav.json" with { type: "json" };
 import userJson from "../../data/user.json" with { type: "json" };
 import { paginate } from "./utils.ts";
 
-/** Меню, одинаковое для всех страниц */
-export const nav: Nav = navJson;
+/** Меню; пункт текущей страницы отмечается по пути запроса */
+export function nav(pathname: string): Nav {
+  return navJson.map((item) => ({ ...item, active: item.href === pathname }));
+}
 
 /**
  * Проверка логина. Для примера подходит только admin/admin:
@@ -39,20 +41,29 @@ export function list(page: number): List {
 export function indexPage(page: number, authorized: boolean): IndexPage {
   return {
     ...indexJson,
-    nav,
+    nav: nav("/"),
     user: authorized ? userJson : undefined,
     list: authorized ? list(page) : undefined,
   };
 }
 
-export function loginPage(error?: string): LoginPage {
-  return { title: "Вход", nav, error };
+export function loginPage(
+  form: { login?: string; remember?: boolean } = {},
+  error?: string,
+): LoginPage {
+  return {
+    title: "Вход",
+    nav: nav("/login"),
+    error,
+    login: form.login ?? "",
+    remember: form.remember ?? false,
+  };
 }
 
 export function aboutPage(): AboutPage {
-  return { ...aboutJson, nav };
+  return { ...aboutJson, nav: nav("/about") };
 }
 
 export function errorPage(status: number, message: string): ErrorPage {
-  return { title: "Ошибка", nav, status, message };
+  return { title: "Ошибка", nav: nav(""), status, message };
 }

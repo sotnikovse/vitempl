@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import type { LoginPage } from "../types.ts";
 import DefaultLayout from "../layouts/DefaultLayout.vue";
+import FormField from "../partials/FormField.vue";
 
 defineProps<LoginPage>();
 </script>
@@ -11,19 +12,26 @@ defineProps<LoginPage>();
       <h1>{{ title }}</h1>
       <p v-if="error" class="error">{{ error }}</p>
       <form class="login-form" method="post" action="/login">
-        <input
+        <FormField
+          label="Логин"
           name="login"
-          placeholder="admin"
+          type="text"
           autocomplete="username"
-          required
+          :value="login"
+          :hint="null"
         />
-        <input
-          type="password"
+        <FormField
+          label="Пароль"
           name="password"
-          placeholder="admin"
+          type="password"
           autocomplete="current-password"
-          required
+          :value="null"
+          hint="Для примера подходит admin / admin"
         />
+        <label class="remember">
+          <input type="checkbox" name="remember" :checked="remember" />
+          Запомнить меня
+        </label>
         <button type="submit">Войти</button>
       </form>
     </main>
@@ -37,10 +45,15 @@ defineProps<LoginPage>();
   max-width: 320px;
 }
 
-.login-form input,
 .login-form button {
   font: inherit;
   padding: 8px 12px;
+}
+
+.remember {
+  display: flex;
+  gap: 8px;
+  align-items: center;
 }
 
 .error {
