@@ -51,8 +51,12 @@ export interface JinjaDialect {
   some(path: string, alias: string): string;
   /** Условие «значения нет» */
   none(path: string): string;
-  /** Литерал «значения нет»: `None` в askama, `none` в Jinja */
-  nullLiteral: string;
+  /**
+   * Литерал «значения нет»: `None` в askama, `none` в Jinja. Если у «пусто»
+   * есть тип (askama), он берётся из типа prop (`string`, `number`,
+   * `boolean`); undefined — тип неизвестен, и значение передать нельзя.
+   */
+  nullLiteral(type?: string): string | undefined;
   /** Связывает ли `some` значение с новым именем: внутри ветки путь заменяется на него */
   binds: boolean;
   /** Поддерживает ли шаблонизатор компонент, который подключает сам себя */
@@ -507,7 +511,12 @@ export function generateJinjaLike(
         continue;
       }
       const key = camelize(argument);
-      const value = toValue(sameNameShorthand(prop, key), scope, prop.loc);
+      const value = toValue(
+        sameNameShorthand(prop, key),
+        scope,
+        prop.loc,
+        templates.get(template)?.propTypes?.[key],
+      );
       if (value) {
         props.set(key, value);
       }
@@ -678,10 +687,18 @@ export function generateJinjaLike(
     exp: SimpleExpressionNode,
     scope: Scope,
     loc: SourceLocation,
+    type?: string,
   ): string | undefined {
     // простые идентификаторы и null Vue разбирает без ast
     if (exp.ast ? isNullish(exp.ast) : NULLISH.has(exp.content.trim())) {
-      return dialect.nullLiteral;
+      const literal = dialect.nullLiteral(type);
+      if (literal === undefined) {
+        error(
+          `${dialect.name} не может вывести тип «пусто» для prop: тип в TypeScript должен быть string, number или boolean (с null), иначе передайте значение из данных`,
+          loc,
+        );
+      }
+      return literal;
     }
     const literal = exp.ast ? literalOf(exp.ast) : undefined;
     return literal ?? toPath(exp, scope, loc);

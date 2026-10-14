@@ -12,6 +12,11 @@ export interface Sfc {
   descriptor: SFCDescriptor;
   /** Импортированные компоненты: имя → импорт */
   components: Map<string, ComponentImport>;
+  /**
+   * Типы props из `defineProps<...>()` без `null` и `undefined`: имя →
+   * `string`, `number` или `boolean`. Остальные типы не перечисляются.
+   */
+  propTypes: Record<string, string>;
   /** Ошибки разбора, неподдерживаемые блоки и код в `<script setup>` */
   errors: TemplateDiagnostic[];
 }
@@ -29,6 +34,7 @@ export function parseSfc(source: string): Sfc {
     return {
       descriptor,
       components: new Map(),
+      propTypes: {},
       errors: errors.map((error) => ({
         message: error.message,
         loc:
@@ -42,6 +48,7 @@ export function parseSfc(source: string): Sfc {
   return {
     descriptor,
     components: script.components,
+    propTypes: script.propTypes,
     errors: [...checkBlocks(descriptor), ...script.errors],
   };
 }
@@ -104,9 +111,10 @@ function checkBlocks(descriptor: SFCDescriptor): TemplateDiagnostic[] {
 function readScript(descriptor: SFCDescriptor) {
   const components = new Map<string, ComponentImport>();
   const errors: TemplateDiagnostic[] = [];
+  let propTypes: Record<string, string> = {};
   const script = descriptor.scriptSetup;
   if (!script) {
-    return { components, errors };
+    return { components, propTypes, errors };
   }
 
   const lineOffset = script.loc.start.line - 1;
@@ -124,7 +132,17 @@ function readScript(descriptor: SFCDescriptor) {
         ? { line: loc.line + lineOffset, column: loc.column + 1 }
         : { line: script.loc.start.line, column: 1 },
     });
-    return { components, errors };
+    return { components, propTypes, errors };
+  }
+
+  // объявления типов файла: на них может ссылаться defineProps<Props>()
+  const declarations = new Map<string, TSNode>();
+  for (const statement of program.body) {
+    if (statement.type === "TSInterfaceDeclaration") {
+      declarations.set(statement.id.name, statement.body);
+    } else if (statement.type === "TSTypeAliasDeclaration") {
+      declarations.set(statement.id.name, statement.typeAnnotation);
+    }
   }
 
   for (const statement of program.body) {
@@ -166,6 +184,7 @@ function readScript(descriptor: SFCDescriptor) {
         continue;
       case "ExpressionStatement":
         if (isDefineProps(statement.expression)) {
+          propTypes = readPropTypes(statement.expression, declarations);
           continue;
         }
         break;
@@ -174,6 +193,10 @@ function readScript(descriptor: SFCDescriptor) {
           statement.declarations.length === 1 &&
           isDefineProps(statement.declarations[0].init)
         ) {
+          propTypes = readPropTypes(
+            statement.declarations[0].init,
+            declarations,
+          );
           continue;
         }
         break;
@@ -184,7 +207,52 @@ function readScript(descriptor: SFCDescriptor) {
       loc,
     });
   }
-  return { components, errors };
+  return { components, propTypes, errors };
+}
+
+type TSNode = { type: string; [key: string]: any };
+
+const PROP_TYPES: Record<string, string> = {
+  TSStringKeyword: "string",
+  TSNumberKeyword: "number",
+  TSBooleanKeyword: "boolean",
+};
+
+/** Типы props из аргумента типа `defineProps<...>()`: литерал или объявление в файле */
+function readPropTypes(call: any, declarations: Map<string, TSNode>) {
+  const types: Record<string, string> = {};
+  let node: TSNode | undefined = (call.typeParameters ?? call.typeArguments)
+    ?.params?.[0];
+  if (node?.type === "TSTypeReference" && node.typeName.type === "Identifier") {
+    node = declarations.get(node.typeName.name);
+  }
+  const members: TSNode[] =
+    node?.type === "TSTypeLiteral" || node?.type === "TSInterfaceBody"
+      ? (node.members ?? node.body)
+      : [];
+  for (const member of members) {
+    const key = member.key;
+    const name =
+      key?.type === "Identifier"
+        ? key.name
+        : key?.type === "StringLiteral"
+          ? key.value
+          : undefined;
+    const type = member.typeAnnotation?.typeAnnotation as TSNode | undefined;
+    if (member.type !== "TSPropertySignature" || !name || !type) {
+      continue;
+    }
+    // `string | null` — тип без пустых значений
+    const rest = (type.type === "TSUnionType" ? type.types : [type]).filter(
+      (item: TSNode) =>
+        item.type !== "TSNullKeyword" && item.type !== "TSUndefinedKeyword",
+    );
+    const known = rest.length === 1 ? PROP_TYPES[rest[0].type] : undefined;
+    if (known) {
+      types[name] = known;
+    }
+  }
+  return types;
 }
 
 function isDefineProps(node: unknown) {

@@ -287,6 +287,12 @@ export default function vitempl(options: VitemplOptions): Plugin {
             ),
           );
         }
+        // типы props известны из исходника, а не из шаблона: вызывающий
+        // использует их, когда передаёт «пусто» в типизированный шаблонизатор
+        for (const [file, sfc] of templates) {
+          const name = templateName(file);
+          infos.set(name, { ...infos.get(name)!, propTypes: sfc.propTypes });
+        }
       }
 
       const errors: string[] = [];

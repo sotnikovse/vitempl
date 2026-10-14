@@ -46,6 +46,8 @@ export interface TemplateInfo {
   params: string[];
   /** В шаблоне есть слот */
   hasSlot: boolean;
+  /** Типы props без `null` и `undefined` (`string`, `number`, `boolean`): нужны, если «пусто» в шаблонизаторе имеет тип */
+  propTypes?: Record<string, string>;
 }
 
 export interface GenerateResult {
