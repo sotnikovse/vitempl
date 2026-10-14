@@ -1,3 +1,9 @@
+## <small>[0.1.3](https://github.com/sotnikovse/vitempl/compare/v0.1.2...v0.1.3) (2026-10-14)</small>
+### Bug Fixes
+
+* **vitempl:** hide template engine tags from Vite while it parses a page ([#20](https://github.com/sotnikovse/vitempl/issues/20)) ([c6d2860](https://github.com/sotnikovse/vitempl/commit/c6d28603efc844c7e98af7955ec2f3fd9457a848))
+* **vitempl:** typed None for null props in askama ([#19](https://github.com/sotnikovse/vitempl/issues/19)) ([73da2f5](https://github.com/sotnikovse/vitempl/commit/73da2f5a92200b7ab645860bfdacfbec2e93b4af))
+
 ## <small>[0.1.2](https://github.com/sotnikovse/vitempl/compare/v0.1.1...v0.1.2) (2026-10-13)</small>
 ### Features
 
