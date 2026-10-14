@@ -1,15 +1,15 @@
 <script setup lang="ts">
-import type { ErrorPage } from "@server/types";
+import type { AboutPage } from "../types.ts";
 import DefaultLayout from "../layouts/DefaultLayout.vue";
 
-defineProps<ErrorPage>();
+defineProps<AboutPage>();
 </script>
 
 <template>
   <DefaultLayout :nav="nav">
     <main class="container">
-      <h1>{{ status }}</h1>
-      <p>{{ message }}</p>
+      <h1>{{ title }}</h1>
+      <p>{{ description }}</p>
     </main>
   </DefaultLayout>
 </template>

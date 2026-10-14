@@ -25,7 +25,7 @@ const MAX_BODY_SIZE = 4096;
 const HOSTNAME = "127.0.0.1";
 const PORT = Number(process.env.PORT) || 8080;
 const DIST_DIR = fileURLToPath(
-  new URL("../../node-template-hbs/dist", import.meta.url),
+  new URL("../../templates/dist/handlebars", import.meta.url),
 );
 const PUBLIC_DIR = path.join(DIST_DIR, "public");
 const TEMPLATES_DIR = path.join(DIST_DIR, "templates");

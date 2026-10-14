@@ -2,33 +2,36 @@
 
 `examples/` — рабочий пример связки сборки и сервера:
 
-- `node-template-hbs/` — шаблоны на Vue SFC и клиентская статика, собираются vitempl в шаблоны Handlebars;
-- `node-app/` — сервер на Node.js, который рендерит собранные шаблоны и раздаёт статику; что он умеет и как устроен — в его README.
+- `templates/` — шаблоны на Vue SFC и клиентская статика. Исходники не зависят от шаблонизатора: под какой собирать, задаёт переменная `ENGINE` (`handlebars`, `askama`, `jinja`), результат попадает в `dist/<ENGINE>/`;
+- `data/` — общие JSON-данные страниц, из которых сервер собирает данные для шаблонов;
+- `node-app/` — сервер на Node.js (Handlebars), который рендерит собранные шаблоны и раздаёт статику; что он умеет и как устроен — в его README.
 
-Собрать шаблоны и запустить сервер примера можно из корня репозитория: `npm run example:build`, затем `npm run example:start`.
+Собрать шаблоны для Handlebars и запустить сервер примера можно из корня репозитория: `npm run example:build`, затем `npm run example:start`. Для другого шаблонизатора: `ENGINE=askama npm run build --workspace=example-templates`.
 
 ## Структура проекта шаблонов
 
 ```
 index.html      shell — HTML-документ, в который оборачивается каждая страница
-public/         статика без обработки, копируется в dist/public как есть
+engine.ts       выбор шаблонизатора по переменной ENGINE (для vite и eslint)
+public/         статика без обработки, копируется в dist/<ENGINE>/public как есть
 src/
   main.ts       клиентский скрипт, подключает htmx
+  types.ts      типы данных страниц и фрагментов — контракт с сервером
   assets/       стили и другие ассеты, которые обрабатывает Vite
   pages/        страницы
   fragments/    фрагменты для htmx
   layouts/      каркасы страниц
   partials/     компоненты
-dist/           результат сборки
+dist/<ENGINE>/  результат сборки: templates/ и public/
 ```
 
 Общие стили лежат в `src/assets/style` и подключаются в shell, стили отдельной страницы или компонента — в его блоке `<style>`.
 
 ## Данные и типы
 
-Данные шаблона — props компонента. Типы страниц и фрагментов описывает сервер, шаблоны импортируют их через алиас `@server/types` (в примере он ведёт в файл типов сервера `node-app`, см. `paths` в `tsconfig.app.json`):
+Данные шаблона — props компонента. Типы страниц и фрагментов лежат рядом с шаблонами, в `src/types.ts`, и служат контрактом: сервер на любом языке отдаёт данные такой формы (в `node-app` она проверяется типами `data.ts`, для других серверов повторяется вручную):
 
-<<< ../examples/node-template-hbs/src/pages/about.vue
+<<< ../examples/templates/src/pages/about.vue
 
 Типы в шаблонах проверяет vue-tsc при сборке, в редакторе проверку и автодополнение даёт расширение Vue (Vue - Official).
 
@@ -36,4 +39,4 @@ dist/           результат сборки
 
 Страница передаёт своё содержимое в слот layout:
 
-<<< ../examples/node-template-hbs/src/layouts/DefaultLayout.vue
+<<< ../examples/templates/src/layouts/DefaultLayout.vue

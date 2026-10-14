@@ -1,8 +1,8 @@
 # node-app
 
-Пример SSR-сервера на Node.js для шаблонов из [node-template-hbs](../node-template-hbs/README.md): рендерит шаблоны из `node-template-hbs/dist/templates` и раздаёт статику из `node-template-hbs/dist/public`. Служит для проверки шаблонов и показывает, что нужно от сервера сборке — контракт в [документации vitempl](../../packages/vitempl/docs/introduction.md).
+Пример SSR-сервера на Node.js для шаблонов из [templates](../templates/README.md): рендерит шаблоны Handlebars из `templates/dist/handlebars/templates` и раздаёт статику из `templates/dist/handlebars/public`. Служит для проверки шаблонов и показывает, что нужно от сервера сборке — контракт в [документации vitempl](../../docs/introduction.md).
 
-Данные страниц и фрагментов собираются в `src/data.ts` из JSON-файлов в `data/`, а типы шаблонов выводятся из этих функций в `src/types.ts`, поэтому типы и данные не расходятся. Шаблоны берут типы через алиас `@server/types`.
+Данные страниц и фрагментов собираются в `src/data.ts` из общих JSON-файлов в [`examples/data`](../data). Форму данных описывают типы в [`templates/src/types.ts`](../templates/src/types.ts), `data.ts` их соблюдает, и сервер на другом языке повторяет ту же форму.
 
 Шаблоны сервер читает при старте, поэтому в dev-режиме он перезапускается при изменении собранных шаблонов.
 
@@ -11,5 +11,5 @@
 ## Скрипты
 
 - `npm run start` — запуск сервера на http://127.0.0.1:8080 (порт меняется переменной `PORT`), перед запуском нужно собрать шаблоны (`npm run example:build` в корне)
-- `npm run dev` — запуск с перезапуском при изменении `src/`, `data/` и собранных шаблонов в `node-template-hbs/dist/templates`; шаблоны должны быть уже собраны
+- `npm run dev` — запуск с перезапуском при изменении `src/`, `examples/data` и собранных шаблонов в `templates/dist/handlebars/templates`; шаблоны должны быть уже собраны
 - `npm run typecheck` — проверка типов

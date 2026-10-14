@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { LoginPage } from "@server/types";
+import type { LoginPage } from "../types.ts";
 import DefaultLayout from "../layouts/DefaultLayout.vue";
 
 defineProps<LoginPage>();

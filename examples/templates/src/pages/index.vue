@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { IndexPage } from "@server/types";
+import type { IndexPage } from "../types.ts";
 import DefaultLayout from "../layouts/DefaultLayout.vue";
 import ListItems from "../partials/ListItems.vue";
 
