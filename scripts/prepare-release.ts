@@ -4,6 +4,7 @@ import {
   prepareRelease,
 } from "@vitejs/release-scripts";
 import {
+  assertHasChanges,
   defaultPackage,
   getPkgDir,
   releasePackages,
@@ -20,6 +21,11 @@ const pkg = process.argv[2];
 const githubServerUrl = getRequiredEnv("GITHUB_SERVER_URL");
 const githubRepository = getRequiredEnv("GITHUB_REPOSITORY");
 const githubRunId = getRequiredEnv("GITHUB_RUN_ID");
+
+if (!releasePackages.includes(pkg as (typeof releasePackages)[number])) {
+  throw new Error(`Invalid release package ${JSON.stringify(pkg)}`);
+}
+assertHasChanges(pkg);
 
 const { tag, version } = await prepareRelease({
   packages: releasePackages,
