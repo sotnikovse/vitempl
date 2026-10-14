@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { Nav } from "@server/types";
+import type { Nav } from "../types.ts";
 
 defineProps<{ links: Nav }>();
 </script>
@@ -10,7 +10,11 @@ defineProps<{ links: Nav }>();
     <nav>
       <ul>
         <li v-for="item in links" :key="item.href">
-          <a :href="item.href">{{ item.title }}</a>
+          <a
+            :href="item.href"
+            :aria-current="item.active ? 'page' : undefined"
+            >{{ item.title }}</a
+          >
         </li>
       </ul>
     </nav>

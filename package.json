@@ -37,7 +37,7 @@
     "docs:dev": "vitepress dev docs",
     "docs:build": "vitepress build docs",
     "docs:preview": "vitepress preview docs",
-    "example:build": "npm run build --workspace=node-template-hbs",
+    "example:build": "npm run build --workspace=example-templates",
     "example:start": "npm run start --workspace=node-app"
   },
   "devDependencies": {

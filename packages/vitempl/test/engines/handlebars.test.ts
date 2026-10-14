@@ -55,6 +55,15 @@ describe("handlebars", () => {
     ).toBe("{{#if a}}<a></a>{{else if b}}<b></b>{{else}}<i></i>{{/if}}");
   });
 
+  test("переводит проверку на null в if и unless", () => {
+    expect(code('<p v-if="user != null">{{ user.name }}</p>')).toBe(
+      "{{#if user}}<p>{{user.name}}</p>{{/if}}",
+    );
+    expect(code('<p v-if="user == null">гость</p>')).toBe(
+      "{{#unless user}}<p>гость</p>{{/unless}}",
+    );
+  });
+
   test("переводит отрицание в условии в unless", () => {
     expect(code('<p v-if="!user">гость</p>')).toBe(
       "{{#unless user}}<p>гость</p>{{/unless}}",

@@ -46,11 +46,18 @@ export interface GenerateContext {
    */
   templates: ReadonlyMap<string, TemplateInfo>;
   /**
-   * Типы props по именам шаблонов без `null` и `undefined` (`string`,
-   * `number`, `boolean`): нужны, если «пусто» в шаблонизаторе имеет тип.
-   * Нет записи — исходник шаблона неизвестен (проверка одного файла).
+   * Типы props по именам шаблонов: нужны, если «пусто» в шаблонизаторе
+   * имеет тип. Нет записи — исходник шаблона неизвестен (проверка одного файла).
    */
-  propTypes?: ReadonlyMap<string, Record<string, string>>;
+  propTypes?: ReadonlyMap<string, Record<string, PropType>>;
+}
+
+/** Тип prop из `defineProps<...>()` */
+export interface PropType {
+  /** Тип без `null` и `undefined`; не задан для остальных (объекты, массивы, смеси) */
+  type?: "string" | "number" | "boolean";
+  /** Допускает `null` или `undefined` (в том числе необязательный prop) */
+  nullable: boolean;
 }
 
 export interface TemplateInfo {

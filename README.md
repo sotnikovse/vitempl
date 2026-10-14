@@ -10,7 +10,7 @@ Vite-плагин: собирает шаблоны для серверного �
 ## Части проекта
 
 - `packages/` — пакеты vitempl: Vite-плагин [vitempl](./packages/vitempl/README.md) и плагин ESLint [@vitempl/eslint-plugin](./packages/eslint-plugin/README.md)
-- `examples/` — пример сборки шаблонов и сервера к ним: шаблоны [node-template-hbs](./examples/node-template-hbs/README.md) и сервер [node-app](./examples/node-app/README.md)
+- `examples/` — пример сборки шаблонов и сервера к ним: общие шаблоны [templates](./examples/templates/README.md) и серверы к ним: [node-app](./examples/node-app/README.md) (Handlebars), [axum-app](./examples/axum-app/README.md) (askama)
 - `docs/` — [docs](./docs/index.md)
 
 ## Скрипты
@@ -21,7 +21,7 @@ Vite-плагин: собирает шаблоны для серверного �
 - `npm run docs:dev` — запуск документации в режиме разработки
 - `npm run docs:build` — сборка документации
 - `npm run docs:preview` — предпросмотр собранной документации
-- `npm run example:build` — сборка шаблонов примера (`examples/node-template-hbs`)
+- `npm run example:build` — сборка шаблонов примера для Handlebars (`examples/templates`; другой шаблонизатор — переменная `ENGINE`, см. [README шаблонов](./examples/templates/README.md))
 - `npm run example:start` — запуск сервера примера (`examples/node-app`)
 
 ## Релизы

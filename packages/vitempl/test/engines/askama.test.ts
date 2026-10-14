@@ -1,6 +1,6 @@
 import { describe, expect, test } from "vitest";
 import { parse } from "vue/compiler-sfc";
-import type { TemplateInfo } from "../../src/engine.ts";
+import type { PropType, TemplateInfo } from "../../src/engine.ts";
 import { askama } from "../../src/engines/askama.ts";
 
 const components = new Map([
@@ -13,7 +13,7 @@ interface Options {
   entry?: boolean;
   name?: string;
   templates?: Record<string, TemplateInfo>;
-  propTypes?: Record<string, Record<string, string>>;
+  propTypes?: Record<string, Record<string, PropType>>;
 }
 
 function generate(template: string, options: Options = {}) {
@@ -185,7 +185,11 @@ describe("askama", () => {
       "partials/Box": { params: ["error", "count", "flag"], hasSlot: false },
     };
     const propTypes = {
-      "partials/Box": { error: "string", count: "number", flag: "boolean" },
+      "partials/Box": {
+        error: { type: "string", nullable: true },
+        count: { type: "number", nullable: true },
+        flag: { type: "boolean", nullable: true },
+      },
     };
     expect(
       code('<Box :error="null" :count="undefined" :flag="null" />', {
@@ -197,6 +201,26 @@ describe("askama", () => {
     );
   });
 
+  test("оборачивает значение в Some для prop, допускающего пустое", () => {
+    const templates = {
+      "partials/Box": { params: ["hint", "title"], hasSlot: false },
+    };
+    const propTypes = {
+      "partials/Box": {
+        hint: { type: "string" as const, nullable: true },
+        title: { type: "string" as const, nullable: false },
+      },
+    };
+    expect(
+      code(`<Box hint="подсказка" :title="'заголовок'" />`, {
+        templates,
+        propTypes,
+      }),
+    ).toBe(
+      '{% import "partials/Box.html" as partials_box %}{{ partials_box::render(hint=Some("подсказка"), title="заголовок") }}',
+    );
+  });
+
   test("сообщает, если тип prop для None неизвестен", () => {
     const templates = {
       "partials/Box": { params: ["items"], hasSlot: false },
@@ -204,7 +228,7 @@ describe("askama", () => {
     expect(
       messages('<Box :items="null" />', {
         templates,
-        propTypes: { "partials/Box": {} },
+        propTypes: { "partials/Box": { items: { nullable: true } } },
       })[0],
     ).toContain("не может вывести тип «пусто»");
   });
@@ -214,6 +238,21 @@ describe("askama", () => {
       "partials/Box": { params: ["items"], hasSlot: false },
     };
     expect(messages('<Box :items="null" />', { templates })).toEqual([]);
+  });
+
+  test("не выводит атрибут, привязанный к prop со значением None", () => {
+    const propTypes = {
+      "pages/index": { value: { type: "string" as const, nullable: true } },
+    };
+    expect(code('<input :value="value" :name="name">', { propTypes })).toBe(
+      '<input {% if let Some(value) = value %}value="{{ value }}"{% endif %} name="{{ name }}">',
+    );
+    // внутри проверки на null значение уже не пустое
+    expect(
+      code('<input v-if="value != null" :value="value">', { propTypes }),
+    ).toBe(
+      '{% if let Some(value) = value %}<input value="{{ value }}">{% endif %}',
+    );
   });
 
   test("выводит атрибут со значением только при условии", () => {

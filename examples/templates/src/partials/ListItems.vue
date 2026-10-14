@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { List } from "@server/types";
+import type { List } from "../types.ts";
 
 defineProps<{ list: List }>();
 </script>

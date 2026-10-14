@@ -50,9 +50,9 @@ describe("parseSfc", () => {
     expect(descriptor.script?.content).toContain("console.log(1)");
   });
 
-  test("читает типы props без null и undefined", () => {
+  test("читает типы props и допустимость пустого значения", () => {
     const literal = parseSfc(
-      '<script setup lang="ts">\ndefineProps<{ a: string | null; b?: number; c: boolean | undefined; d: string[] | null; e: string | number }>();\n</script>\n<template><p></p></template>\n',
+      '<script setup lang="ts">\ndefineProps<{ a: string | null; b?: number; c: boolean | undefined; d: string[] | null; e: string | number; f: string }>();\n</script>\n<template><p></p></template>\n',
     );
     const named = parseSfc(
       '<script setup lang="ts">\ninterface Props { a: string | null }\ntype Other = { b: number }\nconst props = defineProps<Props>();\n</script>\n<template><p></p></template>\n',
@@ -60,11 +60,14 @@ describe("parseSfc", () => {
 
     expect(literal.errors).toEqual([]);
     expect(literal.propTypes).toEqual({
-      a: "string",
-      b: "number",
-      c: "boolean",
+      a: { type: "string", nullable: true },
+      b: { type: "number", nullable: true },
+      c: { type: "boolean", nullable: true },
+      d: { type: undefined, nullable: true },
+      e: { type: undefined, nullable: false },
+      f: { type: "string", nullable: false },
     });
-    expect(named.propTypes).toEqual({ a: "string" });
+    expect(named.propTypes).toEqual({ a: { type: "string", nullable: true } });
   });
 
   test("запрещает <style scoped> и <style module>", () => {
