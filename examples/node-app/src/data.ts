@@ -55,7 +55,7 @@ export function loginPage(
     title: "Вход",
     nav: nav("/login"),
     error,
-    login: form.login ?? "",
+    login: form.login,
     remember: form.remember ?? false,
   };
 }

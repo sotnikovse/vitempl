@@ -54,7 +54,7 @@ struct LoginPage {
     /// Сообщение об ошибке входа
     error: Option<String>,
     /// Введённый логин: после ошибки форма заполняется заново
-    login: String,
+    login: Option<String>,
     /// Отмечена ли галочка «Запомнить меня»
     remember: bool,
 }
@@ -156,7 +156,7 @@ async fn about() -> Response {
     )
 }
 
-fn login_page(login: String, remember: bool, error: Option<String>) -> LoginPage {
+fn login_page(login: Option<String>, remember: bool, error: Option<String>) -> LoginPage {
     LoginPage {
         title: "Вход".into(),
         nav: data::nav("/login"),
@@ -170,7 +170,7 @@ async fn login_form(headers: HeaderMap) -> Response {
     if is_authorized(&headers) {
         return Redirect::to("/").into_response();
     }
-    render(StatusCode::OK, login_page(String::new(), false, None))
+    render(StatusCode::OK, login_page(None, false, None))
 }
 
 async fn login(Form(form): Form<LoginForm>) -> Response {
@@ -179,7 +179,7 @@ async fn login(Form(form): Form<LoginForm>) -> Response {
         return render(
             StatusCode::UNAUTHORIZED,
             login_page(
-                form.login,
+                Some(form.login),
                 remember,
                 Some("Неверный логин или пароль".into()),
             ),

@@ -240,6 +240,21 @@ describe("askama", () => {
     expect(messages('<Box :items="null" />', { templates })).toEqual([]);
   });
 
+  test("не выводит атрибут, привязанный к prop со значением None", () => {
+    const propTypes = {
+      "pages/index": { value: { type: "string" as const, nullable: true } },
+    };
+    expect(code('<input :value="value" :name="name">', { propTypes })).toBe(
+      '<input {% if let Some(value) = value %}value="{{ value }}"{% endif %} name="{{ name }}">',
+    );
+    // внутри проверки на null значение уже не пустое
+    expect(
+      code('<input v-if="value != null" :value="value">', { propTypes }),
+    ).toBe(
+      '{% if let Some(value) = value %}<input value="{{ value }}">{% endif %}',
+    );
+  });
+
   test("выводит атрибут со значением только при условии", () => {
     expect(
       code(

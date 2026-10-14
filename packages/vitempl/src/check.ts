@@ -26,6 +26,8 @@ export function checkSource(
   const { file } = options;
   // типы props импортированных компонентов по их путям из импорта
   const propTypes = new Map<string, Record<string, PropType>>();
+  // типы props самого шаблона (в сборке он известен по имени)
+  propTypes.set("", sfc.propTypes);
   if (file) {
     for (const { source: specifier } of sfc.components.values()) {
       try {

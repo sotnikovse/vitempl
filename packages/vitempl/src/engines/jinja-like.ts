@@ -452,7 +452,21 @@ export function generateJinjaLike(
       return ` ${name}="${value}"`;
     }
     const path = toPath(exp, scope, directive.loc);
-    return path ? ` ${name}="{{ ${path} }}"` : "";
+    if (!path) {
+      return "";
+    }
+    // prop компонента, допускающий «пусто», не выводится, как во Vue; путь,
+    // подменённый условием (`v-if="x != null"`), уже не пустой
+    if (
+      path === exp.content.trim() &&
+      !scope.aliases.has(path) &&
+      context.propTypes?.get(context.name)?.[path]?.nullable
+    ) {
+      const alias = aliasFor(path, scope);
+      const value = dialect.binds ? alias : path;
+      return ` {% if ${dialect.some(path, alias)} %}${name}="{{ ${value} }}"{% endif %}`;
+    }
+    return ` ${name}="{{ ${path} }}"`;
   }
 
   /**

@@ -11,19 +11,19 @@
 
 ## Что где показано
 
-| Возможность                                                              | Где смотреть                                                                                                  |
-| ------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------- |
-| Условия `v-if` / `v-else`                                                | `pages/index.vue`: пользователь или гость                                                                     |
-| Цикл `v-for`                                                             | `partials/AppHeader.vue`, `partials/ListItems.vue`                                                            |
-| Layout и слот, вложенные компоненты                                      | `layouts/DefaultLayout.vue` (слот для страницы), страницы передают в него `<main>`                            |
-| Фрагмент для htmx: список подменяется без перезагрузки                   | `fragments/items-list.vue`, ссылки пагинации в `partials/ListItems.vue`                                       |
-| Атрибут только при условии (`cond ? 'page' : undefined`)                 | `partials/AppHeader.vue`: `aria-current` у текущего пункта меню                                               |
-| Булев атрибут по данным (`:checked`)                                     | `pages/login.vue`: галочка «Запомнить меня» после ошибки входа                                                |
-| `null` в props (`string \| null`), типизированный `None` в askama        | `pages/login.vue` и `partials/FormField.vue`: поле без подсказки (`:hint="null"`) и с подсказкой (`hint="…"`) |
-| Клиентский скрипт компонента (`<script>`), подключается только где нужен | `partials/ConfirmForm.vue`: подтверждение выхода на главной                                                   |
-| Стили страницы и компонента (`<style>`)                                  | `pages/login.vue`, `partials/FormField.vue`                                                                   |
-| Общие стили и статика                                                    | `src/assets/style`, `public/`                                                                                 |
-| Контракт данных с сервером                                               | `src/types.ts`                                                                                                |
+| Возможность                                                              | Где смотреть                                                                                                                           |
+| ------------------------------------------------------------------------ | -------------------------------------------------------------------------------------------------------------------------------------- |
+| Условия `v-if` / `v-else`                                                | `pages/index.vue`: пользователь или гость                                                                                              |
+| Цикл `v-for`                                                             | `partials/AppHeader.vue`, `partials/ListItems.vue`                                                                                     |
+| Layout и слот, вложенные компоненты                                      | `layouts/DefaultLayout.vue` (слот для страницы), страницы передают в него `<main>`                                                     |
+| Фрагмент для htmx: список подменяется без перезагрузки                   | `fragments/items-list.vue`, ссылки пагинации в `partials/ListItems.vue`                                                                |
+| Атрибут только при условии (`cond ? 'page' : undefined`)                 | `partials/AppHeader.vue`: `aria-current` у текущего пункта меню                                                                        |
+| Булев атрибут по данным (`:checked`)                                     | `pages/login.vue`: галочка «Запомнить меня» после ошибки входа                                                                         |
+| `null` в props (`string \| null`), типизированный `None` в askama        | `pages/login.vue` и `partials/FormField.vue`: `:hint="null"` и `:value="null"` (атрибут `value` не выводится), `hint="…"` с подсказкой |
+| Клиентский скрипт компонента (`<script>`), подключается только где нужен | `partials/ConfirmForm.vue`: подтверждение выхода на главной                                                                            |
+| Стили страницы и компонента (`<style>`)                                  | `pages/login.vue`, `partials/FormField.vue`                                                                                            |
+| Общие стили и статика                                                    | `src/assets/style`, `public/`                                                                                                          |
+| Контракт данных с сервером                                               | `src/types.ts`                                                                                                                         |
 
 ## Структура проекта шаблонов
 

@@ -50,7 +50,7 @@ export interface LoginPage {
   /** Сообщение об ошибке входа */
   error?: string;
   /** Введённый логин: после ошибки форма заполняется заново */
-  login: string;
+  login?: string;
   /** Отмечена ли галочка «Запомнить меня» */
   remember: boolean;
 }
