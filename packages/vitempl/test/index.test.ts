@@ -297,4 +297,48 @@ describe("vitempl с askama", () => {
       "{% macro render() %}<main>{{ caller() }}</main>{% endmacro %}",
     );
   });
+
+  test("прячет теги шаблонизатора от Vite и возвращает их в шаблон", async () => {
+    const root = await mkdtemp(path.join(tmpdir(), "templates-tags-"));
+    const warnings: string[] = [];
+    const logger = createLogger("warn");
+    logger.warn = (message) => warnings.push(message);
+    // теги в позициях, где они невалидны для parse5: после атрибута и без пробела
+    const body = '<body class="a"{% if dark %} data-dark{% endif %}>';
+    try {
+      await mkdir(path.join(root, "src/pages"), { recursive: true });
+      await writeFile(
+        path.join(root, "index.html"),
+        `<html>${body}<!--app-html--></body></html>`,
+      );
+      await writeFile(
+        path.join(root, "src/pages/index.vue"),
+        "<template><p>{{ title }}</p></template>",
+      );
+
+      await build({
+        root,
+        configFile: false,
+        customLogger: logger,
+        plugins: [
+          vitempl({
+            engine: askama(),
+            outDir: path.join(root, "dist/templates"),
+          }),
+        ],
+        build: { outDir: path.join(root, "dist/public"), emptyOutDir: true },
+      });
+
+      expect(warnings.join("\n")).not.toContain("Unable to parse HTML");
+      const page = await readFile(
+        path.join(root, "dist/templates/pages/index.html"),
+        "utf-8",
+      );
+      expect(page).toContain(body);
+      expect(page).toContain("<p>{{ title }}</p>");
+      expect(page).not.toContain("__vitempl_");
+    } finally {
+      await rm(root, { recursive: true, force: true });
+    }
+  }, 15_000);
 });

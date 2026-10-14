@@ -99,6 +99,7 @@ export function jinjaEngine(dialect: JinjaDialect): TemplateEngine {
   return {
     name: dialect.name,
     extension: dialect.extension,
+    tags: /\{%[\s\S]*?%\}|\{\{[\s\S]*?\}\}|\{#[\s\S]*?#\}/g,
     analyze: (nodes, context) =>
       generateJinjaLike(nodes, context, dialect).info,
     generate: (nodes, context) => generateJinjaLike(nodes, context, dialect),
