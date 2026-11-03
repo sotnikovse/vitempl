@@ -28,6 +28,10 @@ Vite-плагин: собирает шаблоны для серверного �
 
 Actions → **Prepare Release** (пакет и тип релиза) открывает PR `release: <tag>` с новой версией и CHANGELOG. После мержа (заголовок коммита сохранить `release: <tag>`) **Publish Package** публикует пакет в npm и создаёт GitHub Release с текстом из CHANGELOG. Нужны секрет `NPM_TOKEN` и разрешение «Allow GitHub Actions to create pull requests».
 
+## Ревью PR
+
+Workflow **PR Agent** запускает [PR-Agent](https://github.com/The-PR-Agent/pr-agent) на открытие PR: публикует ревью (`/review`) и предложения по коду (`/improve`). Команды можно вызвать и комментарием в PR, например `/ask <вопрос>`. Модели — через DeepInfra, нужен секрет `DEEPINFRA_KEY`.
+
 ## Примеры
 
 Пример шаблонов и сервера к ним:
