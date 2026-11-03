@@ -1,0 +1,36 @@
+name: PR Agent
+
+on:
+  pull_request:
+    types: [opened, reopened, ready_for_review]
+  issue_comment:
+    types: [created]
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.event.issue.number }}
+  cancel-in-progress: false
+
+permissions: {}
+
+jobs:
+  pr-agent:
+    if: ${{ github.event.sender.type != 'Bot' && (github.event_name == 'pull_request' || github.event.issue.pull_request) }}
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      issues: write
+      pull-requests: write
+    steps:
+      - name: Run PR Agent
+        uses: the-pr-agent/pr-agent@efdde4afe14aa401a3889012c7f3e9ef3081a430 # v0.49.0
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          DEEPINFRA.KEY: ${{ secrets.DEEPINFRA_KEY }}
+          CONFIG.MODEL: deepinfra/deepseek-ai/DeepSeek-V4-Flash
+          CONFIG.FALLBACK_MODELS: '["deepinfra/openai/gpt-oss-120b"]'
+          CONFIG.MAX_MODEL_TOKENS: 128000
+          CONFIG.OUTPUT_RUN_DETAILS: true
+          CONFIG.OUTPUT_RUN_COST: true
+          GITHUB_ACTION_CONFIG.AUTO_DESCRIBE: false
+          GITHUB_ACTION_CONFIG.AUTO_REVIEW: true
+          GITHUB_ACTION_CONFIG.AUTO_IMPROVE: true
