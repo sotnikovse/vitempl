@@ -16,5 +16,10 @@
     display: inline-flex;
     gap: 15px;
     font-size: 16px;
+
+    a[aria-current="page"] {
+      font-weight: 600;
+      text-decoration: none;
+    }
   }
 }

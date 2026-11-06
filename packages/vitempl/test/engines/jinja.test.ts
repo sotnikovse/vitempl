@@ -1,6 +1,6 @@
 import { describe, expect, test } from "vitest";
 import { parse } from "vue/compiler-sfc";
-import type { TemplateInfo } from "../../src/engine.ts";
+import type { PropType, TemplateInfo } from "../../src/engine.ts";
 import { jinja } from "../../src/engines/jinja.ts";
 
 const components = new Map([["Box", "partials/Box"]]);
@@ -9,6 +9,7 @@ interface Options {
   entry?: boolean;
   name?: string;
   templates?: Record<string, TemplateInfo>;
+  propTypes?: Record<string, Record<string, PropType>>;
 }
 
 function generate(template: string, options: Options = {}) {
@@ -20,6 +21,9 @@ function generate(template: string, options: Options = {}) {
     name: options.name ?? "pages/index",
     entry: options.entry ?? true,
     templates: new Map(Object.entries(options.templates ?? {})),
+    propTypes: options.propTypes
+      ? new Map(Object.entries(options.propTypes))
+      : undefined,
   });
 }
 
@@ -87,6 +91,15 @@ describe("jinja", () => {
     );
     expect(code(`<a :aria-current="active ? undefined : 'page'">о</a>`)).toBe(
       '<a {% if not (active) %}aria-current="page"{% endif %}>о</a>',
+    );
+  });
+
+  test("не выводит атрибут, привязанный к prop со значением none", () => {
+    const propTypes = {
+      "pages/index": { value: { type: "string" as const, nullable: true } },
+    };
+    expect(code('<input :value="value" :name="name">', { propTypes })).toBe(
+      '<input {% if value is not none %}value="{{ value }}"{% endif %} name="{{ name }}">',
     );
   });
 

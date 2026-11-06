@@ -19,6 +19,7 @@ export { checkSource } from "./check.ts";
 export type {
   GenerateContext,
   GenerateResult,
+  PropType,
   TemplateInfo,
   TemplateDiagnostic,
   TemplateEngine,

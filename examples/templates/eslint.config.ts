@@ -1,7 +1,7 @@
 import tsParser from "@typescript-eslint/parser";
 import vitempl from "@vitempl/eslint-plugin";
-import { handlebars } from "vitempl/handlebars";
 import vueParser from "vue-eslint-parser";
+import { createEngine } from "./engine.ts";
 
 // https://eslint.org/docs/latest/use/configure/
 export default [
@@ -12,7 +12,7 @@ export default [
       parserOptions: { parser: tsParser, sourceType: "module" },
     },
     plugins: { vitempl },
-    settings: { vitempl: { engine: handlebars() } },
+    settings: { vitempl: { engine: createEngine() } },
     rules: { "vitempl/syntax": "error" },
   },
 ];

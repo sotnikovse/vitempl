@@ -455,7 +455,7 @@ function generateHandlebars(
       const condition = toConditionNode(ast, scope);
       if (!condition) {
         error(
-          `условие «${exp?.loc.source}» не поддерживается: допустимы путь к данным или его отрицание (!путь)`,
+          `условие «${exp?.loc.source}» не поддерживается: допустимы путь к данным, его отрицание (!путь) или проверка на null`,
           loc,
         );
       }
@@ -472,6 +472,21 @@ function generateHandlebars(
     if (node.type === "UnaryExpression" && node.operator === "!") {
       const path = pathOf(node.argument, scope);
       return path ? { helper: "unless", path } : undefined;
+    }
+    // проверка на null: в Handlebars нет разницы между null и «ложным»
+    // значением, поэтому это обычное условие на путь (см. docs/syntax.md)
+    if (
+      node.type === "BinaryExpression" &&
+      isNullish(node.right as BabelNode)
+    ) {
+      const path = pathOf(node.left as BabelNode, scope);
+      if (path && ["!=", "!=="].includes(node.operator)) {
+        return { helper: "if", path };
+      }
+      if (path && ["==", "==="].includes(node.operator)) {
+        return { helper: "unless", path };
+      }
+      return;
     }
     const path = pathOf(node, scope);
     return path ? { helper: "if", path } : undefined;

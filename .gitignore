@@ -22,3 +22,6 @@ dist
 # Vitepress
 **/.vitepress/dist
 **/.vitepress/cache
+
+# Rust
+target
