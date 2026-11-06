@@ -255,6 +255,15 @@ describe("askama", () => {
     );
   });
 
+  test("не принимает локальную переменную v-for за nullable prop", () => {
+    const propTypes = {
+      "pages/index": { value: { type: "string" as const, nullable: true } },
+    };
+    expect(
+      code('<input v-for="value in values" :value="value">', { propTypes }),
+    ).toBe('{% for value in values %}<input value="{{ value }}">{% endfor %}');
+  });
+
   test("выводит атрибут со значением только при условии", () => {
     expect(
       code(

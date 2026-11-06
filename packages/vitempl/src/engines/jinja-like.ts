@@ -459,6 +459,7 @@ export function generateJinjaLike(
     // подменённый условием (`v-if="x != null"`), уже не пустой
     if (
       path === exp.content.trim() &&
+      !scope.locals.has(path) &&
       !scope.aliases.has(path) &&
       context.propTypes?.get(context.name)?.[path]?.nullable
     ) {
