@@ -14,7 +14,21 @@ permissions: {}
 
 jobs:
   pr-agent:
-    if: ${{ github.event.sender.type != 'Bot' && (github.event_name == 'pull_request' || github.event.issue.pull_request) }}
+    if: >-
+      ${{
+        github.event.sender.type != 'Bot' &&
+        (
+          (
+            github.event_name == 'pull_request' &&
+            contains(fromJSON('["OWNER", "COLLABORATOR"]'), github.event.pull_request.author_association)
+          ) ||
+          (
+            github.event_name == 'issue_comment' &&
+            github.event.issue.pull_request &&
+            contains(fromJSON('["OWNER", "COLLABORATOR"]'), github.event.comment.author_association)
+          )
+        )
+      }}
     runs-on: ubuntu-latest
     permissions:
       contents: read
