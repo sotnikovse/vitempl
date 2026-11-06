@@ -1,3 +1,8 @@
+## [0.2.0](https://github.com/sotnikovse/vitempl/compare/v0.1.4...v0.2.0) (2026-11-06)
+### Features
+
+* **examples:** shared templates, richer demo and axum-app (askama) ([#27](https://github.com/sotnikovse/vitempl/issues/27)) ([8c7324e](https://github.com/sotnikovse/vitempl/commit/8c7324e3b6c1d6958e8c669200751b6ea2fc8897))
+
 ## <small>[0.1.4](https://github.com/sotnikovse/vitempl/compare/v0.1.3...v0.1.4) (2026-10-14)</small>
 ### Bug Fixes
 
